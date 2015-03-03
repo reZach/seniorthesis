@@ -1,11 +1,33 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<html ng-app="myapp">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="/stylesheets/site.css" />
+        
+        <script type="text/javascript" src="/javascripts/jquery.min.js"></script>
+        <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/javascripts/angular.min.js"></script>
+        <script type="text/javascript" src="/javascripts/cookie.js"></script>
+        <script type="text/javascript" src="/javascripts/ng-google-chart.js"></script>
+        <script type="text/javascript" src="/javascripts/app.js"></script>
+        
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>        
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a>link</a>
+                </div>
+            </div>
+        </div>
+        <div class="container body-content">
+            
+            <div ui-view></div>
+                        
+        </div>
+    </body>
 </html>
