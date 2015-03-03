@@ -6,11 +6,11 @@ app.config([
         $stateProvider.state("home",
             {
                 url: "/index",
-                templateUrl: "./partials/index.ejs",
+                templateUrl: "/views/partials/main.ejs",
                 controller: "activityCtrl"
             });
             
-        $urlRouterProvider.otherwise("index");
+        $urlRouterProvider.otherwise("home");
     }
 ]);
 
