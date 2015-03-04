@@ -6,7 +6,7 @@ app.config([
         $stateProvider.state("home",
             {
                 url: "/index",
-                templateUrl: "/views/partials/main.ejs",
+                templateUrl: "/views/partials/main.html",
                 controller: "activityCtrl"
             });
             
@@ -36,6 +36,20 @@ app.run(function ($rootScope) {
             docCookies.setItem("balanceCookiesHasVisited", true, Infinity);
         }
 
+        var ref = new Firebase("https://balanceapp.firebaseio.com");
+        
+        function authHandler(error, authData) {
+          if (error) {
+            console.log("Login Failed!", error);
+          } else {
+            console.log("Authenticated successfully with payload:", authData);
+          }
+        }
+        
+        ref.authWithPassword({
+          email    : 'zwensta@carthage.edu',
+          password : 'password'
+        }, authHandler);
     }())
 
 });
