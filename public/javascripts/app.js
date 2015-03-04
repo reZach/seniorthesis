@@ -3,18 +3,26 @@ var app = angular.module("myapp", ["googlechart", "ui.router"]);
 
 app.config([
     "$stateProvider", "$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
-        $stateProvider.state("home",
+        $stateProvider.state("index",
             {
                 url: "/index",
-                templateUrl: "/views/partials/main.html",
-                controller: "activityCtrl"
+                views: {
+                    "hub": {
+                        templateUrl: "/views/partials/main.html" ,
+                        controller: "activityCtrl"
+                    },
+                    "accountHub": {
+                        templateUrl: "/views/partials/userHub.html",
+                        controller: "userCtrl"
+                    }
+                }
             });
             
-        $urlRouterProvider.otherwise("home");
+        $urlRouterProvider.otherwise("index");
     }
 ]);
 
-app.run(function ($rootScope) {
+app.run(["$rootScope", function ($rootScope) {
 
     (function () {
         /*
@@ -36,9 +44,9 @@ app.run(function ($rootScope) {
             docCookies.setItem("balanceCookiesHasVisited", true, Infinity);
         }
 
-        var ref = new Firebase("https://balanceapp.firebaseio.com");
         
-        function authHandler(error, authData) {
+        
+        /*function authHandler(error, authData) {
           if (error) {
             console.log("Login Failed!", error);
           } else {
@@ -49,14 +57,22 @@ app.run(function ($rootScope) {
         ref.authWithPassword({
           email    : 'zwensta@carthage.edu',
           password : 'password'
-        }, authHandler);
+        }, authHandler);*/
+        
+        
     }())
 
+}]);
+
+
+
+app.factory("userService", function() {
+    var o = {};
+    
+    o.ref = new Firebase("https://balanceapp.firebaseio.com");
+    
+    return o;
 });
-
-
-
-
 
 
 
@@ -397,4 +413,31 @@ app.controller("activityCtrl", ["$scope", "$interval", "dataService", function (
         $scope.graph = dataService.buildChart();
     });
     
+}]);
+
+
+app.controller("userCtrl", ["$scope", "userService", function ($scope, userService) {
+
+    $scope.test = "hi";
+    
+    $scope.registerUser = function registerUser(userEmail, userPassword){
+    
+        if(userEmail != "" || userPassword != ""){
+            return;
+        }
+        
+        var ref = userService.ref;
+        
+        ref.createUser({
+            email: userEmail,
+            password: userPassword
+        }, function(error, userData) {
+            
+            if (error) {
+                console.log("Error creating user:", error);
+              } else {
+                console.log("Successfully created user account with uid:", userData.uid);
+            }
+        });      
+    };
 }]);
