@@ -11,9 +11,16 @@ var users = require('./routes/users');
 var app = express();
 var mongoose = require('mongoose');
 
-require("./models/Activities");
 require("./models/Data");
-mongoose.connect('mongodb://localhost/balance');
+require("./models/Activities");
+
+mongoose.connect('mongodb://localhost/balance', function(err) {
+    if(err) {
+        console.log("connection error: ", err);
+    } else {
+        console.log("connection successful");
+    }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
