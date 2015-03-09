@@ -1,10 +1,10 @@
-var LocalStrategy = require("passport-local").Strategy;
-var User = require("../models/Users");
-var bCrypt = require("bcrypt-nodejs");
+var LocalStrategy = require('passport-local').Strategy;
+var User = require('../models/user');
+var bCrypt = require('bcrypt-nodejs');
 
 module.exports = function(passport){
 
-    passport.use("signup", new LocalStrategy({
+    passport.use('signup', new LocalStrategy({
         passReqToCallback: true // allows us to pass back the entire request to the callback
     },
     function(req, username, password, done){
@@ -12,20 +12,20 @@ module.exports = function(passport){
         findOrCreateUser = function(){
         
             // Find a user in mongo with provided username
-            User.findOne({"username": username}, function(err, user){
+            User.findOne({'username': username}, function(err, user){
             
                 // In case of any error, return using the done method
                 if (err){
                     
-                    console.log("Error in signup:", err);
+                    console.log('error in signup: ', err);
                     return done(err);
                 }
                 
                 // Already exists
                 if (user) {
                 
-                    console.log("User already exists with username", username);
-                    return done(null, false, "User already exists");
+                    console.log('user already exists with username: ', username);
+                    return done(null, false, 'user already exists');
                 } else {
                 
                     // If there is no user with that email
@@ -35,18 +35,18 @@ module.exports = function(passport){
                     // Set the user's credentials
                     newUser.username = username;
                     newUser.password = createHash(password);
-                    newUser.email = req.param("email");
+                    newUser.email = req.param('email');
                     
                     // Save the user
                     newUser.save(function(err) {
                     
                         if (err) {
                         
-                            console.log("Error in saving user: ", err);
+                            console.log('error in saving user: ', err);
                             throw err;
                         }
                         
-                        console.log("User registration succesful");
+                        console.log('user registration succesful');
                         return done(null, newUser);
                     });
                 }

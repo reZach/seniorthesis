@@ -1,32 +1,26 @@
-var mongoose = require('mongoose');
-
+// Default node packages
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var passport = require('passport');
-var expressSession = require('express-session');
 
-mongoose.connect('mongodb://localhost/balance', function(err) {
-    if(err) {
-        console.log("connection error: ", err);
-    } else {
-        console.log("connection successful");
-    }
-});
+// MongoDB / Mongoose packages
+// + data models
+var databaseConfig = require('./db');
+var mongoose = require('mongoose');
 
-require("./models/Data");
-require("./models/Activities");
-require("./models/Users");
+require('./models/data');
+require('./models/activity');
+require('./models/user');
 
-var routes = require('./routes/index');
+mongoose.connect(databaseConfig.url, databaseConfig.onStartConnect()); // Connect to database
 
+// Create the app
 var app = express();
 
-
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -37,6 +31,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Config Passport
+var passport = require('passport');
+var expressSession = require('express-session');
+
 app.use(expressSession({
     secret: 'mySecretKey',
     resave: true,
@@ -45,16 +44,22 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Initialize Passport
+var initPassport = require('./passport/init');
+initPassport(passport);
+
+// Config routes
+var routes = require('./routes/index');
+
 app.use('/', routes);
 
-// catch 404 and forward to error handler
+// Catch any routes we don't have paths for
+// 404 error
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
-
-// error handlers
 
 // development error handler
 // will print stacktrace
