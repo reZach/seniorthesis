@@ -1,34 +1,32 @@
 var express = require('express');
 var router = express.Router();
 
+function isAuthenticated(req) {
+    if (req.isAuthenticated()) { 
+        return true;
+    }  
+    return false;
+}
+
 module.exports = function(passport){
 
-    router.get('/login', function(req, res){
-        res.render('login', {user: req.user});
-    });    
-    
-    // Path for google authentication
     router.get('/auth/google',
-        passport.authenticate('google', {failureRedirect: '/login'}),
-        function(req, res) {
-      
-            // Redirect home if successful
+        passport.authenticate('google', { scope: 'https://www.googleapis.com/auth/plus.login' })
+    );
+    
+    router.get('/auth/google_oauth2/callback',
+        passport.authenticate('google', {failureRedirect: '/'}),
+        function(req, res) {            
             res.redirect('/');
         }
     );
     
-    router.get('/auth/google/return',
-        passport.authenticate('google', {failureRedirect: '/login'}),
-        function(req, res) {
-            
-            res.redirect('/');
-        }
-    );
-    
-    router.get('/logout', function(req, res){
-    
+    router.get('/logout', function(req, res){    
         req.logout();
-        res.redirect('/');
+        
+        if (isAuthenticated(req) {
+            res.redirect('/');
+        }
     });
     
     return router;
