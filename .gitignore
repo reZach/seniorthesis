@@ -1,2 +1,4 @@
+# DON'T INCLUDE THESE FILES
+
 secretkeys.js
 node_modules/*
