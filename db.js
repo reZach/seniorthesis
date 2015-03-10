@@ -4,9 +4,9 @@ module.exports = {
     'url': 'mongodb://localhost/balance',
     'onStartConnect': function(err){
         if(err) {
-            console.log('connection error: ', err);
+            console.log('Error connecting to [mongodb://localhost/balance]: ', err);
         } else {
-            console.log('connection successful');
+            console.log('Connected to [mongodb://localhost/balance]');
         }
     }
 }
