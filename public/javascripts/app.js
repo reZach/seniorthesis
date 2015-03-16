@@ -43,22 +43,6 @@ app.run(["$rootScope", function ($rootScope) {
 
             docCookies.setItem("balanceCookiesHasVisited", true, Infinity);
         }
-
-        
-        
-        /*function authHandler(error, authData) {
-          if (error) {
-            console.log("Login Failed!", error);
-          } else {
-            console.log("Authenticated successfully with payload:", authData);
-          }
-        }
-        
-        ref.authWithPassword({
-          email    : 'zwensta@carthage.edu',
-          password : 'password'
-        }, authHandler);*/
-        
         
     }())
 
@@ -101,6 +85,25 @@ app.service("dataService", function () {
         }
 
         return [];
+    }
+    
+    this.getActiveActivity = function(){
+    
+        var activities = this.getActivities();
+        
+        if (activities.length == 0){
+        
+            $(".js-current-activity").text("Not currently tracking time for any activity");
+        } else {
+        
+            for (var i = 0; i < activities.length; i++){
+            
+                if (activities[i].active) {
+                    $(".js-current-activity").text("Tracking time for: " + "[" + activities[i].name + "]");
+                    break;
+                }
+            }
+        }        
     }
 
     this.saveActivity = function (activity) {
@@ -306,6 +309,7 @@ app.service("dataService", function () {
 
     this.buildChart = function (day) {
 
+        var graphObj = {list: []};
         var graph = {};
         var graphData = this.formatChartInformation(" ");
 
@@ -335,30 +339,68 @@ app.service("dataService", function () {
                     }
                 ]
             });
+            
+            graphObj.list.push({
+                name: graphData[i].name,
+                value: Math.floor(graphData[i].time / graphData[graphData.length - 1] * 100),
+                str: graphData[i].strTime
+            });
         }
 
         graph.data.rows = rowsData;
         graph.type = "PieChart";
-        graph.options = {
-            "title": "All time",
-            "height": 450,
-            "width": 450,
+        graph.options = {            
+            "height": 400,
+            "width": 400,
             legend: {
                 position: "none"
             }
         };
 
-        return graph;
+        graphObj.graph = graph;
+        
+        graphObj.list.sort(
+                function (a, b) {
+                    if (a.value > b.value) { return 1; }
+                    if (b.value < a.value) { return -1; }
+                    return 0;
+                });
+        
+        return graphObj;
     };
 });
 
-
+app.factory("user", ["$http", "dataService", function($http, dataService){
+    
+    var o = {
+        
+        user: {},
+        getMe: function() {
+            var promise = $http.get('/getme');
+            
+            // Call on success of api call
+            promise.success(function(obj){
+                angular.copy(obj, o.user);
+            });
+            
+            return promise;
+        },
+        register: function() {
+            return $http.post('/update', user);
+        }
+    
+    };    
+    
+    return o;
+}]);
 
 app.controller("activityCtrl", ["$scope", "$interval", "dataService", function ($scope, $interval, dataService) {
     
     $scope.newActivity = "";
-    $scope.graph = {};
+    $scope.graphData = {};
     $scope.activities = dataService.getActivities();
+    
+    dataService.getActiveActivity();
 
     $scope.save = function (activity) {
 
@@ -410,34 +452,24 @@ app.controller("activityCtrl", ["$scope", "$interval", "dataService", function (
         return docCookies.getItem("activitiesTime");
     }, function (oldVal, newVal) {
 
-        $scope.graph = dataService.buildChart();
+        var obj = dataService.buildChart();
+        
+        $scope.graphData.graph = obj.graph;
+        $scope.graphData.list = obj.list;
     });
     
 }]);
 
 
-app.controller("userCtrl", ["$scope", "userService", function ($scope, userService) {
+app.controller("userCtrl", ["$scope", "userService", "user", function ($scope, userService, user) {
 
     $scope.test = "hi";
     
-    $scope.registerUser = function registerUser(userEmail, userPassword){
+    $scope.user = user.user;
     
-        if(userEmail != "" || userPassword != ""){
-            return;
-        }
-        
-        var ref = userService.ref;
-        
-        ref.createUser({
-            email: userEmail,
-            password: userPassword
-        }, function(error, userData) {
-            
-            if (error) {
-                console.log("Error creating user:", error);
-              } else {
-                console.log("Successfully created user account with uid:", userData.uid);
-            }
-        });      
-    };
+    user.getMe().success(function(a){
+        // to-do?
+    }).error(function(b){
+        // to-do?
+    });
 }]);

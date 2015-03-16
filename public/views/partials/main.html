@@ -1,11 +1,14 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="row text-center">
+            <h4 class="js-current-activity">Tracking time for: []</h4>
             <form novalidate>
                 <input type="text" placeholder="Activity name" ng-model="newActivity" />
                 <input type="submit" value="Add activity" ng-click="save(newActivity)" />
-            </form>
+            </form>            
         </div>
+    </div>
+    <div class="col-xs-12">        
         <div class="row">
             <div class="col-xs-2">&nbsp;</div>
             <div class="col-xs-6">
@@ -20,12 +23,35 @@
                 </div>
             </div>
         </div>
+        <div class="row text-center">
+            <div class="btn btn-success js-create-graph" ng-click="calculateTime()">Generate graph</div>
+        </div>
     </div>
     <div class="col-xs-12">
-        <div class="row text-center">
-            <h4 class="js-current-activity">Tracking time for: [noactivity]</h4>
-            <div class="btn btn-success js-create-graph" ng-click="calculateTime()">Auto calculate graph</div>
-            <div google-chart chart="graph" />
-        </div>
+        <div class="row">
+            
+            <!-- Desktop -->
+            <div class="visible-lg">
+                <div class="col-md-8">
+                    <div google-chart chart="graphData.graph" style="width:400px;margin:0 auto;" />
+                </div>
+                <div class="col-md-4">
+                    <ul ng-repeat="activity in graphData.list | orderBy: '-value'">
+                        <li>{{activity.value}}% {{activity.name}} [{{activity.str}}]</li>
+                    </ul>
+                </div>
+            </div>
+            
+            
+            <!-- Mobile -->
+            <div class="hidden-lg">
+                <div class="col-xs-8">
+                    <div google-chart chart="graphData.graph" style="width:200px;margin:0 auto;" />
+                </div>
+                <div class="col-xs-4">
+                
+                </div>
+            </div>            
+        </div>        
     </div>
 </div>

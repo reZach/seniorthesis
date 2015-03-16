@@ -1,11 +1,17 @@
 var express = require('express');
 var router = express.Router();
 
+function ensureAuthenticated(req, res) {
+  if (req.isAuthenticated()) { return true; }
+  return false;
+}
+
 // Routes
 module.exports = function(passport){
 
     // Home
     router.get("/", function(req, res){
+    
         res.render("index", {title: "Express"});
     });
     
@@ -27,6 +33,15 @@ module.exports = function(passport){
         req.logout();
         res.redirect('/');
     });
+    
+    // Me
+    router.get('/getme', function(req, res){
+        if (req.isAuthenticated()){
+            return res.json(req.user);
+        }
+        
+        return res.status(409).json({});
+    });   
     
     return router;
 }

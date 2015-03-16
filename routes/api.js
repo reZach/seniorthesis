@@ -1,20 +1,26 @@
+var express = require('express');
+var mongoose = require('mongoose');
+var Data = require('./models/data');
+var Activity = require('./models/activity');
+var User = require('./models/user');
 
-var Secrets = require('../secretkeys');
-var User = require('../models/user');
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var router = express.Router();
 
-module.exports = function(passport){
+function ensureAuthenticated(req, res) {
+  if (req.isAuthenticated()) { return true; }
+  return false;
+}
+
+
+module.exports = function(){
+
+    router.post('/update', function(req, res, next) {
     
-    // Google login
-    passport.use(new GoogleStrategy({ 
-        clientID: Secrets.clientID,
-        clientSecret: Secrets.clientSecret,
-        callbackURL: 'http://127.0.0.1:3000/auth/google_oauth2/callback'
-    }, function(accessToken, refreshToken, profile, done) {
-
+        var a = req.body;
+        
         // Create or find user here
         User.findOne({
-            'googleId': profile.id
+            'googleId': req.body.
         }, function(err, user) {
             if (err) {
                 return done(err);
@@ -39,5 +45,7 @@ module.exports = function(passport){
                 return done(err, user);
             }
         });
-    }));
-};
+    });
+
+    return router;
+}
