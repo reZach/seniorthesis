@@ -1,8 +1,8 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var Data = require('./models/data');
-var Activity = require('./models/activity');
-var User = require('./models/user');
+var Data = require('./../models/data');
+var Activity = require('./../models/activity');
+var User = require('./../models/user');
 
 var router = express.Router();
 
@@ -14,37 +14,11 @@ function ensureAuthenticated(req, res) {
 
 module.exports = function(){
 
-    router.post('/update', function(req, res, next) {
+    router.post('/update', function(req, res) {
     
-        var a = req.body;
+        console.log("tes");
         
-        // Create or find user here
-        User.findOne({
-            'googleId': req.body.
-        }, function(err, user) {
-            if (err) {
-                return done(err);
-            }
-            
-            // No user was found
-            if (!user) {
-                user = new User({
-                    googleId: profile.id,
-                    name: profile.displayName,
-                    data: []
-                });
-                
-                user.save(function(err){
-                    if (err) {
-                        console.log(err);
-                    }
-                    console.log("created user");
-                    return done(err, user);
-                });
-            } else {
-                return done(err, user);
-            }
-        });
+        res.send(req.body.name);
     });
 
     return router;

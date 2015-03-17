@@ -52,9 +52,10 @@ googleLogin(passport);
 
 // Config routes
 var routes = require('./routes/index')(passport);
+var routesApi = require('./routes/api');
 
 app.use('/', routes);
-
+app.use('/', routesApi);
 
 // Catch any routes we don't have paths for
 // 404 error

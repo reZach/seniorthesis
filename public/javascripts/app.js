@@ -385,8 +385,13 @@ app.factory("user", ["$http", "dataService", function($http, dataService){
             
             return promise;
         },
-        register: function() {
-            return $http.post('/update', user);
+        update: function() {
+        
+            var obj = JSON.parse(docCookies.getItem("activitiesTime")) || [];
+            
+            var promise = $http.post('/update', obj);
+            
+            return promise;
         }
     
     };    
@@ -472,4 +477,6 @@ app.controller("userCtrl", ["$scope", "userService", "user", function ($scope, u
     }).error(function(b){
         // to-do?
     });
+    
+    user.update();
 }]);
