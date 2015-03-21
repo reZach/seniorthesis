@@ -99,11 +99,14 @@ app.service("dataService", function () {
             for (var i = 0; i < activities.length; i++){
             
                 if (activities[i].active) {
-                    $(".js-current-activity").text("Tracking time for: " + "[" + activities[i].name + "]");
-                    break;
+                    $(".js-current-activity").text("Tracking time for " + activities[i].name);
+                    
+                    return activities[i].name;
                 }
             }
-        }        
+        }
+        
+        return "";
     }
 
     this.saveActivity = function (activity) {
@@ -312,6 +315,7 @@ app.service("dataService", function () {
         var graphObj = {list: []};
         var graph = {};
         var graphData = this.formatChartInformation(" ");
+        var activeActivityName = this.getActiveActivity();
 
         var rowsData = [];
 
@@ -343,7 +347,8 @@ app.service("dataService", function () {
             graphObj.list.push({
                 name: graphData[i].name,
                 value: Math.floor(graphData[i].time / graphData[graphData.length - 1] * 100),
-                str: graphData[i].strTime
+                str: graphData[i].strTime,
+                active: (activeActivityName != "" && graphData[i].name == activeActivityName)
             });
         }
 
@@ -387,6 +392,7 @@ app.factory("user", ["$http", "dataService", function($http, dataService){
         },
         update: function() {
         
+            debugger;
             var obj = JSON.parse(docCookies.getItem("activitiesTime")) || [];
             
             var promise = $http.post('/update', obj);

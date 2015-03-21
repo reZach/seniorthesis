@@ -9,15 +9,12 @@
     
     <!-- Collapsed content -->
     <div class="collapse navbar-collapse" id="navbar-collapse">
-        <ul class="nav navbar-nav">            
-            <form class="navbar-form navbar-left">
-                <div class="form-group">
-                    <a href="/auth/google" class="btn btn-success" ng-disabled="user.name">Google</a>
-                    <a href="/logout" class="btn btn-danger" ng-disabled="!user.name">Sign out</a>
-                </div>
-            </form>
-            <li class="navbar-gray" ng-show="user.name">Welcome {{user.name}}</li>
-            <li class="navbar-gray btn btn-default" ng-show="user.name">Upload to database</li>
+        <ul class="nav navbar-nav navbar-right">
+            <li ng-if="!user.name"><a href="/auth/google"><i class="fa fa-sign-in"></i> Google</a></li>            
+            <li ng-if="user.name"><a>Logged in as: {{user.name}}</a></li>
+            <li ng-if="user.name"><a href="/"><i class="fa fa-wifi"> Sync</i></a></li>
+            <li ng-if="user.name"><a href="/logout"><i class="fa fa-sign-out"></i> Signout</a></li>
+            <li><a href="#"><i class="fa fa-cog"></i> Options</a></li>
         </ul>
     </div>
 </div>
