@@ -33,17 +33,19 @@
             <h1 class="text-center mainpage-header">Activities</h1>
             <div class="row">
                 <form class="text-center" novalidate>
-                    <input type="text" placeholder="Activity name" ng-model="newActivity" />
-                    <input type="submit" value="Add activity" ng-click="save(newActivity)" />
+                    <input type="text" placeholder="Activity name" ng-model="newActivityName" />
+                    <input type="submit" value="Add activity" ng-click="newActivity(newActivityName)" />
                 </form>
             </div>
             <div class="row">
                 <div class="col-lg-offset-2 col-lg-8">
                     <h4>List</h4>
+                    <div class="row text-center">
+                        <div class="btn btn-primary" ng-click="startSelectedActivity()">Start selected activity</div>
+                    </div>
                     <div class="row" ng-repeat="activity in activities | orderBy: 'name'">
-                        <div class="btn btn-default text-left" ng-class="{ active : activity.active }" ng-click="activate(activity)">{{ activity.name }}</div>
-                        <div class="btn btn-danger" style="float:right;">Remove</div>
-                        <div class="btn btn-primary" ng-class="{ disabled : !activity.active }" ng-click="start(activity)" style="float:right;">Start</div>                        
+                        <div class="btn btn-default text-left" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
+                        <div class="btn btn-danger" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
                     </div>
                 </div>
             </div>
