@@ -41,7 +41,10 @@ app.factory("activityService", function() {
         
         // Holds all data
         data: {
-            activities: []
+            activities: [],
+            activeActivity: {
+                val: ""
+            }
         },
         
         // Sets cookie
@@ -220,13 +223,26 @@ app.factory("activityService", function() {
                         date: currentDate.toJSON(),
                         timestamp: currentTime
                     });
-                }                
+                } 
+
+                // If date of the data block is today
+                else if (currentDate.setHours(0, 0, 0, 0) == activityDataDate){
+                    
+                    // Update the latest data block
+                    if (selectedActivity.data[selectedActivity.data.length - 1].timestamp != 0){
+                    
+                        selectedActivity.data[selectedActivity.data.length - 1].time += (currentTime - selectedActivity.data[selectedActivity.data.length - 1].timestamp);
+                    }
+                    
+                    selectedActivity.data[selectedActivity.data.length - 1].timestamp = currentTime;
+                }
             }
             
             obj.setActivitiesCookie(activities);
             
             // Needed to update controllers properly
             angular.copy(activities, obj.data.activities);
+            angular.copy({val: selectedActivity.name}, obj.data.activeActivity);
         }, 
         
         // Updates time on all activities
@@ -256,7 +272,7 @@ app.factory("activityService", function() {
                             
                             // Our timestamp is re-assigned to the current time
                             // if the activity is active, otherwise it is set to zero
-                            activities[i].data[j].timestamp (activities[i].active ? currentTime : 0);                            
+                            activities[i].data[j].timestamp = (activities[i].active ? currentTime : 0);                            
                         }
                     } else if (currentDate.setHours(0, 0, 0, 0) > activityDataDate){
                  
@@ -266,7 +282,7 @@ app.factory("activityService", function() {
                         
                         // Get the time of the end of the last recorded day
                         var endOfActivityDataDate = new Date(activities[i].data[j].date).setHours(23, 59, 59, 999);
-                        var addToDataBlock = endOfActivityDataDate.getTime() - activityDataDate.getTime();
+                        var addToDataBlock = endOfActivityDataDate - activityDataDate;
                         
                         activities[i].data[j].time += addToDataBlock;
                         activities[i].data[j].timestamp = 0;
@@ -325,9 +341,152 @@ app.factory("graphService", ["activityService", function(activityService){
         
         // Holds all data
         data: {
-            graph: {}
+            chart: {}
         },
-    
+
+        // Creates string representation of an activities' time
+        createTimeRepresentation: function(time){
+        
+            // Calculate each time
+            var years = time / 1000 / 60 / 60 / 24 / 7 / 52;
+            var weeks = years % 1 * 52;
+            var days = weeks % 1 * 7;
+            var hours = days % 1 * 24;
+            var minutes = hours % 1 * 60;
+            var seconds = minutes % 1 * 60;
+
+            // Get rid of all decimals
+            years = Math.floor(years);
+            weeks = Math.floor(weeks);
+            days = Math.floor(days);
+            hours = Math.floor(hours);
+            minutes = Math.floor(minutes);
+            seconds = Math.floor(seconds);
+
+            /* Build string representation of time */
+            var strTime = "";
+
+            if (years != 0) { strTime += years + "y - "; }
+            if (weeks != 0) { strTime += weeks + "w - "; }
+            if (days != 0) { strTime += days + "d - "; }
+            if (hours != 0) { strTime += hours + "h - "; }
+            if (minutes != 0) { strTime += minutes + "m - "; }
+            if (seconds != 0) { strTime += seconds + "s - "; }
+
+            if (strTime.length >= 3) {
+
+                strTime = strTime.substring(0, strTime.length - 3);
+            }
+            
+            return strTime;
+        },
+        
+        // Initialize constants for google-chart
+        initChart: function(){
+        
+            var chart = {};
+            
+            // Initialize all data for our chart
+            // that we can ( minus activity data )            
+            chart.data = {
+                cols: [{
+                    id: "A",
+                    label: "Activity",
+                    type: "string"
+                },
+                {
+                    id: "B",
+                    label: "Time",
+                    type: "string"
+                }],
+                rows: []
+            }
+            
+            chart.type = "PieChart";
+            chart.options = {            
+                "height": 400,
+                "width": 400,
+                legend: {
+                    position: "none"
+                }
+            };
+            
+            return chart;
+        },
+        
+        // Create the chart
+        createChart: function(day){
+        
+            /*
+                Note: 'day' will represent the day
+                in string format of the day we want to 
+                generate a graph for
+                
+                '0'                 = today
+                '-1'                = yesterday
+                '-2'                = 2 days ago
+                '-3'                = 3 days ago
+            */
+            
+            activityService.recalculateActivityTimes();
+            
+            
+            var graph = obj.initChart();
+            var data = activityService.getActivities();
+            var tempDate = new Date(); tempDate = tempDate.setHours(0, 0, 0, 0);
+            var dayInMilliseconds = 1000 * 3600 * 24;
+            var dataBlockDate;
+            
+            var totalActivityTime = 0;
+            var individualActivityTime = 0;
+            
+            // Loop through every activity
+            for (var i = 0; i < data.length; i++){
+            
+                // Loop through each data block
+                for (var j = 0; j < data[i].data.length; j++){
+                
+                    dataBlockDate = new Date(data[i].data[j].date).setHours(0, 0, 0, 0);
+                    
+                    // dayOfDataBlock will equal the string representation
+                    // of the proper day
+                    var dayOfDataBlock = ((tempDate - dataBlockDate) / dayInMilliseconds) * -1;
+
+                    if (dayOfDataBlock == day){
+                        
+                        // Calculate time
+                        totalActivityTime += data[i].data[j].time;
+                        individualActivityTime += data[i].data[j].time;
+                    }
+                }
+                
+                // Add activity data to graph
+                graph.data.rows.push({
+                    c: [
+                        { v: data[i].name }, // name of activity
+                        {
+                            v: individualActivityTime, // STILL NEEDS TO BE FACTORED WITH TOTAL TIME (* this is done later)
+                            f: obj.createTimeRepresentation(individualActivityTime) // string representation of time
+                        }
+                    ]
+                });
+                
+                // Reset individual time
+                individualActivityTime = 0;
+            }
+            
+            // Don't calculate total time if we have no activities
+            // Calculate percentage times (using total time)
+            if (data.length != 0) {
+                for (var i = 0; i < graph.data.rows.length; i++){
+                    
+                    graph.data.rows[i].c[1].v = graph.data.rows[i].c[1].v / totalActivityTime * 100;
+                }
+            }
+            
+            // Needed to update controllers properly
+            angular.copy(graph, obj.data.chart);
+        }
     };
     
     return obj;
@@ -678,10 +837,13 @@ app.factory("user", ["$http", "dataService", function($http, dataService){
     return o;
 }]);
 
-app.controller("activityCtrl2", ["$scope", "activityService", function ($scope, activityService) {
+app.controller("activityCtrl2", ["$scope", "activityService", "graphService", function ($scope, activityService, graphService) {
 
     $scope.activities = activityService.data.activities;
     activityService.initActivities();
+    
+    $scope.googlechart = graphService.data.chart;
+    $scope.activeActivity = activityService.data.activeActivity;
     
     // Creates a new activity
     $scope.newActivity = function(activityName){
@@ -726,6 +888,18 @@ app.controller("activityCtrl2", ["$scope", "activityService", function ($scope, 
             alert(e);
         }
     };
+    
+    // Generates the chart
+    $scope.generateChart = function(){
+        
+        try
+        {
+            graphService.createChart("0");
+        } catch (e) {
+            alert(e);
+        }
+    };
+    
 }]);
 
 app.controller("activityCtrl", ["$scope", "$interval", "dataService", function ($scope, $interval, dataService) {

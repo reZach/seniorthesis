@@ -6,7 +6,7 @@
         <div class="col-lg-5 text-center">
             <h1 class="mainpage-header">Time Allocation</h1>
             <div class="row">
-                <h4 class="js-current-activity">Tracking time for </h4>
+                <h4>Tracking time for: [ {{activeActivity.val}} ]</h4>
             </div>
             <div class="row">
                 <div class="navbar-gray">
@@ -14,8 +14,8 @@
                 </div>
             </div>
             <div class="row">
-                <div google-chart chart="graphData.graph" style="width:400px;margin:0 auto;" />
-                <div class="btn btn-success js-create-graph" ng-click="calculateTime()">Generate graph</div>
+                <div google-chart chart="googlechart" style="margin:0 auto;"/>
+                <div class="btn btn-success" ng-click="generateChart()">Generate chart</div>
             </div>
             <div class="row">
                 <div class="col-lg-offset-2 col-lg-8">
