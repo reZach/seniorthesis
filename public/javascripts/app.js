@@ -44,6 +44,9 @@ app.factory("activityService", function() {
             activities: [],
             activeActivity: {
                 val: ""
+            },
+            idleActivity: {
+                val: "Idle"
             }
         },
         
@@ -55,7 +58,33 @@ app.factory("activityService", function() {
         // Initializes activities on page-load for the controller
         initActivities: function() {
         
+            debugger;
             var activities = obj.getActivities();
+            
+            // Set active activity
+            for (var i = 0; i < activities.length; i++){
+            
+                if (i != 0){
+                    activities = obj.getActivities();
+                }
+                
+                if (activities[i].active){                    
+                    angular.copy({val: activities[i].name}, obj.data.activeActivity);
+                }
+                
+                if (activities[i].selected){
+                    obj.selectActivity(activities[i].name);
+                    activities = obj.getActivities();
+                    
+                    obj.startSelectedActivity(activities[i].name);
+                    activities = obj.getActivities();
+                }
+                
+                activities[i].idle = false;
+                
+                obj.setActivitiesCookie(activities);
+                angular.copy(activities, obj.data.activities);
+            }
             
             angular.copy(activities, obj.data.activities);
         },
@@ -92,7 +121,11 @@ app.factory("activityService", function() {
         
             if (activityName === "undefined" || !activityName) {
                 throw "Cannot add activity with no name";
-            }            
+            }
+            
+            if (activityName === "Idle") {
+                throw "Cannot add activity of 'Idle'";
+            }
             
             var activities;
             
@@ -104,6 +137,7 @@ app.factory("activityService", function() {
                         name: activityName, 
                         active: false,
                         selected: false,
+                        idle: false,
                         data: []
                     })], 
                     Infinity);
@@ -125,10 +159,11 @@ app.factory("activityService", function() {
                     name: activityName, 
                     active: false,
                     selected: false,
+                    idle: false,
                     data: []
                 });
                 
-                obj.setActivitiesCookie(activities);                              
+                obj.setActivitiesCookie(activities);                       
             }
             
             // Needed to update controllers properly
@@ -182,7 +217,7 @@ app.factory("activityService", function() {
                 throw "Could not find selected activity";
             }
         
-        
+            
             /* Calculation logic */
             
             var dataBlock; // Holds reference to data block we will be modifying
@@ -243,6 +278,7 @@ app.factory("activityService", function() {
             // Needed to update controllers properly
             angular.copy(activities, obj.data.activities);
             angular.copy({val: selectedActivity.name}, obj.data.activeActivity);
+            angular.copy({val: "Idle"}, obj.data.idleActivity);
         }, 
         
         // Updates time on all activities
@@ -329,6 +365,119 @@ app.factory("activityService", function() {
             
             // Needed to update controllers properly
             angular.copy(activities, obj.data.activities);
+        },
+        
+        // Swaps to idle
+        idleSwap: function(){
+        
+            /*
+                KEY
+                
+                AA - ActiveActivity
+                IA - IdleActivty
+            */
+            var activities = obj.getActivities();
+            
+            var currentActiveActivity = obj.data.activeActivity.val;
+            var currentIdleActivity = obj.data.idleActivity.val;
+            
+            if (currentActiveActivity == "" && currentIdleActivity == "Idle"){
+            
+                /*
+                    State changes -
+                    
+                    AA:
+                        from "" to "Idle"
+                        from "Idle" to "Idle"
+                    IA:
+                        from "Idle" to "Idle"                
+                */
+                
+                angular.copy({val: "Idle"}, obj.data.idleActivity);
+                angular.copy({val: "Idle"}, obj.data.activeActivity);
+            } else if (currentActiveActivity != "" && currentActiveActivity != "Idle" && currentIdleActivity == "Idle"){
+            
+                /*
+                    State changes -
+                
+                    AA:
+                        from [activity] to "Idle"
+                    IA:
+                        from "Idle" to [activity]
+                */
+                
+                for (var i = 0; i < activities.length; i++){
+                
+                    if (activities[i].active){
+                        
+                        activities[i].active = false;
+                        activities[i].selected = false;
+                        activities[i].idle = true;
+                        
+                        angular.copy({val: activities[i].name}, obj.data.idleActivity);
+                        angular.copy({val: "Idle"}, obj.data.activeActivity);
+                        break;
+                    }
+                }
+            } else if (currentIdleActivity != "" && currentIdleActivity != "Idle" && currentActiveActivity == "Idle"){
+            
+                /*
+                    State changes -
+                    
+                    AA:
+                        from "Idle" to [activity]
+                    IA:                    
+                        from [activity] to "Idle"
+                */
+                
+                for (var i = 0; i < activities.length; i++){
+                
+                    if (activities[i].idle){                                           
+                        
+                        // Need to update reference to array
+                        // so that array is updated properly at the end
+                        obj.selectActivity(activities[i].name);
+                        activities = obj.getActivities();
+                        
+                        obj.startSelectedActivity(activities[i].name);
+                        activities = obj.getActivities();
+                        
+                        activities[i].idle = false;
+                        
+                        angular.copy({val: "Idle"}, obj.data.idleActivity);
+                        angular.copy({val: activities[i].name}, obj.data.activeActivity);
+                        break;
+                    }
+                }
+            }
+            
+            
+            obj.setActivitiesCookie(activities);
+            
+            // Needed to update controllers properly
+            angular.copy(activities, obj.data.activities);
+        },
+        
+        // Resets activities (and "Idle" button status)
+        reset: function(){
+        
+            var activities = obj.getActivities();
+        
+            for (var i = 0; i < activities.length; i++){
+            
+                if (activities[i].idle) {
+                
+                    activities[i].idle = false;
+                    break;
+                }
+            }
+            
+            obj.setActivitiesCookie(activities);
+            
+            // Needed to update controllers properly
+            angular.copy(activities, obj.data.activities);
+            angular.copy({val: "Idle"}, obj.data.idleActivity);
+            angular.copy({val: ""}, obj.data.activeActivity);
         }
     };
     
@@ -807,7 +956,7 @@ app.service("dataService", function () {
     };
 });
 
-app.factory("user", ["$http", "dataService", function($http, dataService){
+app.factory("user", ["$http", "activityService", function($http, activityService){
     
     var o = {
         
@@ -825,9 +974,16 @@ app.factory("user", ["$http", "dataService", function($http, dataService){
         update: function() {
         
             debugger;
-            var obj = JSON.parse(docCookies.getItem("activitiesTime")) || [];
+            var obj = activityService.getActivities();
             
-            var promise = $http.post('/update', obj);
+            var promise = $http.post('/update', obj, {
+                transformRequest: function(data, headersGetter){
+                    return JSON.stringify(data);
+                },
+                transformResponse: function(data, headersGetter){
+                    return JSON.stringify(data);
+                }
+            });
             
             return promise;
         }
@@ -837,13 +993,14 @@ app.factory("user", ["$http", "dataService", function($http, dataService){
     return o;
 }]);
 
-app.controller("activityCtrl2", ["$scope", "activityService", "graphService", function ($scope, activityService, graphService) {
+app.controller("activityCtrl2", ["$scope", "$interval", "activityService", "graphService", function ($scope, $interval, activityService, graphService) {
 
     $scope.activities = activityService.data.activities;
     activityService.initActivities();
     
     $scope.googlechart = graphService.data.chart;
     $scope.activeActivity = activityService.data.activeActivity;
+    $scope.idleActivity = activityService.data.idleActivity;
     
     // Creates a new activity
     $scope.newActivity = function(activityName){
@@ -895,6 +1052,49 @@ app.controller("activityCtrl2", ["$scope", "activityService", "graphService", fu
         try
         {
             graphService.createChart("0");
+        } catch (e) {
+            alert(e);
+        }
+    };
+    
+    // Autogenerate the chart
+    $scope.autogenerateChart = function(){
+    
+        $(".js-autogenerate-chart").addClass("fa-pulse active");
+        $(".js-autogenerate-chart").parent().attr("disabled", true);
+        
+        try
+        {
+            graphService.createChart("0");
+            
+            $interval(function(){
+                graphService.createChart("0");
+            }, 5000);
+        } catch (e) {
+            $(".js-autogenerate-chart").removeClass("fa-pulse active");
+            $(".js-autogenerate-chart").parent().attr("disabled", false);
+        
+            alert(e);
+        }
+    };
+    
+    // Swaps to idle
+    $scope.idleSwap = function(){
+    
+        try
+        {
+            activityService.idleSwap();
+        } catch (e) {
+            alert(e);
+        }
+    };
+    
+    // Reset
+    $scope.reset = function(){
+    
+        try
+        {
+            activityService.reset();
         } catch (e) {
             alert(e);
         }

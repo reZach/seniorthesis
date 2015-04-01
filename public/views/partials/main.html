@@ -9,13 +9,17 @@
                 <h4>Tracking time for: [ {{activeActivity.val}} ]</h4>
             </div>
             <div class="row">
-                <div class="navbar-gray">
-                    or switch to <div class="btn btn-default navbar-gray">Idle</div>
+                <div>
+                    or switch to <div class="btn btn-default navbar-gray" ng-click="idleSwap()">{{ idleActivity.val }}</div>                    
                 </div>
+            </div>
+            <div class="row" ng-if="activeActivity.val == 'Idle' && idleActivity.val != 'Idle'">
+                or <div class="btn btn-default navbar-gray" ng-click="reset()">reset</div>
             </div>
             <div class="row">
                 <div google-chart chart="googlechart" style="margin:0 auto;"/>
                 <div class="btn btn-success" ng-click="generateChart()">Generate chart</div>
+                <div class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
             </div>
             <div class="row">
                 <div class="col-lg-offset-2 col-lg-8">
@@ -45,7 +49,7 @@
                     </div>
                     <div class="row" ng-repeat="activity in activities | orderBy: 'name'">
                         <div class="btn btn-default text-left" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
-                        <div class="btn btn-danger" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
+                        <div class="btn btn-danger" ng-if="!activity.idle" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
                     </div>
                 </div>
             </div>

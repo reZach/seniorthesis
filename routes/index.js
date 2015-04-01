@@ -53,6 +53,8 @@ module.exports = function(passport){
             var user = req.user;
             var activities = req.body;
             
+            
+            console.log(activities);
             res.send(activities);
             
             User.findOne({
