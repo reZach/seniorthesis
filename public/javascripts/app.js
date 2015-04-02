@@ -1023,6 +1023,19 @@ app.factory("user", ["$http", "activityService", function($http, activityService
     return o;
 }]);
 
+app.controller("userCtrl", ["$scope", "user", function ($scope, user) {
+
+    $scope.user = user.user;
+    
+    user.getMe().success(function(a){
+        // to-do?
+    }).error(function(b){
+        // to-do?
+    });
+     
+    user.update();
+ }]);
+
 app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graphService", function ($scope, $interval, activityService, graphService) {
 
     $scope.activities = activityService.data.activities;
