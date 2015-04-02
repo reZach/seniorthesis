@@ -18,6 +18,8 @@ app.config([
                 }
             });
             
+        //$stateProvider.state("
+            
         $urlRouterProvider.otherwise("index");
     }
 ]);
@@ -414,6 +416,9 @@ app.factory("activityService", function() {
                         activities[i].selected = false;
                         activities[i].idle = true;
                         
+                        // Update last timestamp
+                        activities = obj.updateLastDataBlock(activities, i, false);
+                        
                         angular.copy({val: activities[i].name}, obj.data.idleActivity);
                         angular.copy({val: "Idle"}, obj.data.activeActivity);
                         break;
@@ -491,12 +496,8 @@ app.factory("activityService", function() {
                 
                     activities[i].active = false;
                     
-                    /* Update last timestamp */
-                    var lastDataBlock = activities[i].data.length - 1;
-                    var currentTime = Date.now();
-                    
-                    activities[i].data[lastDataBlock].time += (currentTime - activities[i].data[lastDataBlock].timestamp);                            
-                    activities[i].data[lastDataBlock].timestamp = 0;                            
+                    // Update last timestamp
+                    activities = obj.updateLastDataBlock(activities, i, false);
                     
                     break;
                 }
@@ -508,6 +509,19 @@ app.factory("activityService", function() {
             angular.copy(activities, obj.data.activities);
             angular.copy({val: "Idle"}, obj.data.idleActivity);
             angular.copy({val: ""}, obj.data.activeActivity);
+        },
+        
+        // Updates last data block for an activity
+        updateLastDataBlock: function(activities, index, newTimestamp){
+                    
+            // Recalculates time and sets the timestamp
+            var lastDataBlock = activities[index].data.length - 1;
+            var currentTime = Date.now();
+                    
+            activities[index].data[lastDataBlock].time += (currentTime - activities[index].data[lastDataBlock].timestamp);                            
+            activities[index].data[lastDataBlock].timestamp = (newTimestamp ? currentTime : 0);
+            
+            return activities;
         }
     };
     
