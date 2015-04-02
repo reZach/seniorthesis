@@ -10,14 +10,14 @@
             </div>
             <div class="row">
                 <div class="btn-group">
-                    <div class="btn btn-default navbar-gray" ng-click="idleSwap()">switch to {{ idleActivity.val }}</div>
-                    <div class="btn btn-default navbar-gray" ng-click="reset()" ng-if="activeActivity.val == 'Idle' && idleActivity.val != 'Idle'">reset</div>
-                    <div class="btn btn-default navbar-gray" ng-click="stop()" ng-if="activeActivity.val != '' && activeActivity.val != 'Idle' && idleActivity.val == 'Idle'">stop activity</div>
+                    <div class="btn btn-default navbar-gray" title="Pause current activity" ng-click="idleSwap()">switch to {{ idleActivity.val }}</div>
+                    <div class="btn btn-default navbar-gray" title="Reset tracking to a fresh state" ng-click="reset()" ng-if="activeActivity.val == 'Idle' && idleActivity.val != 'Idle'">reset</div>
+                    <div class="btn btn-default navbar-gray" title="Stop tracking for this activity" ng-click="stop()" ng-if="activeActivity.val != '' && activeActivity.val != 'Idle' && idleActivity.val == 'Idle'">stop activity</div>
                 </div>
             </div>
             <div class="row">
                 <div google-chart chart="googlechart" style="margin:0 auto;"/>
-                <div class="btn btn-success" ng-click="generateChart()">Generate chart</div>
+                <div class="btn btn-success" title="Click to generate a chart" ng-click="generateChart()">Generate chart</div>
                 <div class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
             </div>
             <div class="row">
@@ -44,11 +44,11 @@
                 <div class="col-lg-offset-2 col-lg-8">
                     <h4>List</h4>
                     <div class="row text-center">
-                        <div class="btn btn-primary" ng-click="startSelectedActivity()">Start selected activity</div>
+                        <div class="btn btn-primary" title="Start tracking time for the selected activity" ng-click="startSelectedActivity()">Start selected activity</div>
                     </div>
                     <div class="row" ng-repeat="activity in activities | orderBy: 'name'">
-                        <div class="btn btn-default text-left" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
-                        <div class="btn btn-danger" ng-if="!activity.idle" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
+                        <div class="btn btn-default text-left" title="Click to select this activity" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
+                        <div class="btn btn-danger" title="Delete activity and all corresponding data" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
                     </div>
                 </div>
             </div>

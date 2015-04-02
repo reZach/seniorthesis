@@ -356,9 +356,16 @@ app.factory("activityService", function() {
             for (var i = 0; i < activities.length; i++){
             
                 if (activities[i].name == activityName){
+                                                            
+                    if (activities[i].idle){
+                        obj.reset();
+                    } else if (activities[i].active){
+                        obj.stop();                    
+                    }
                     
                     // Remove activity
                     activities.splice(i, 1);
+                    
                     break;
                 }
             }
@@ -597,8 +604,8 @@ app.factory("graphService", ["activityService", function(activityService){
             
             chart.type = "PieChart";
             chart.options = {            
-                "height": 400,
-                "width": 400,
+                "height": 360,
+                "width": 360,
                 legend: {
                     position: "none"
                 }
@@ -1127,7 +1134,8 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
             graphService.createChart("0");
             
             $interval(function(){
-                graphService.createChart("0");
+
+                graphService.createChart("0");                
             }, 5000);
         } catch (e) {
             $(".js-autogenerate-chart").removeClass("fa-pulse active");
