@@ -1,6 +1,12 @@
-
+// Create the Angular app
 var app = angular.module("myapp", ["googlechart", "ui.router"]);
 
+/*************************************
+/
+/   CONFIG
+/
+/
+*************************************/
 app.config([
     "$stateProvider", "$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
         $stateProvider.state("index",
@@ -18,12 +24,18 @@ app.config([
                 }
             });
             
-        //$stateProvider.state("
+        // to-do, other views
             
         $urlRouterProvider.otherwise("index");
     }
 ]);
 
+/*************************************
+/
+/   ON STARTUP
+/
+/
+*************************************/
 app.run(["$rootScope", function ($rootScope) {
 
     // Run any code on startup if we wanted to
@@ -36,7 +48,14 @@ app.run(["$rootScope", function ($rootScope) {
 
 }]);
 
-// dataServiceFactory
+
+/*************************************
+/
+/   SERVICES
+/
+/
+*************************************/
+// Service that handles activities
 app.factory("activityService", function() {
     
     var obj = {
@@ -60,20 +79,18 @@ app.factory("activityService", function() {
         // Initializes activities on page-load for the controller
         initActivities: function() {
         
-            debugger;
             var activities = obj.getActivities();
             
             // Set active activity
             for (var i = 0; i < activities.length; i++){
-            
+      
+                // On the 2+ pass of the foor loop,
+                // we need to update the "activities" variable
                 if (i != 0){
                     activities = obj.getActivities();
                 }
-                
-                if (activities[i].active){                    
-                    angular.copy({val: activities[i].name}, obj.data.activeActivity);
-                }
-                
+                                
+                // Start the selected activity
                 if (activities[i].selected){
                     obj.selectActivity(activities[i].name);
                     activities = obj.getActivities();
@@ -82,8 +99,10 @@ app.factory("activityService", function() {
                     activities = obj.getActivities();
                 }
                 
+                // No activity is idle on page load
                 activities[i].idle = false;
                 
+                // Update variables
                 obj.setActivitiesCookie(activities);
                 angular.copy(activities, obj.data.activities);
             }
@@ -127,6 +146,10 @@ app.factory("activityService", function() {
             
             if (activityName === "Idle") {
                 throw "Cannot add activity of 'Idle'";
+            }
+            
+            if (activityName === "") {
+                throw "Activity cannot be empty";
             }
             
             var activities;
@@ -181,6 +204,8 @@ app.factory("activityService", function() {
             
             var activities = obj.getActivities();
             
+            // Select the activity, the rest of the
+            // activities we de-select
             for (var i = 0; i < activities.length; i++){
             
                 if (activities[i].name == activityName){                
@@ -211,14 +236,23 @@ app.factory("activityService", function() {
                     activities[i].active = true;
                 } else {
                 
+                    // Every other activity is now not active
                     activities[i].active = false;
                 }
             }
             
+            // If we could not find the selected activity for some reason (bug catching)
             if (selectedActivity === "undefined" || !selectedActivity){
                 throw "Could not find selected activity";
             }
         
+            /*
+                Once we find the activity we want to start,
+                we calculate any time that activity has accumulated.
+
+                Or if this is the first time the activity has started,
+                we will not calculate any time the activity has accumulated
+            */
             
             /* Calculation logic */
             
@@ -356,7 +390,9 @@ app.factory("activityService", function() {
             for (var i = 0; i < activities.length; i++){
             
                 if (activities[i].name == activityName){
-                                                            
+                            
+                    // These checks will properly dispose
+                    // of special-case activities (activities in an idle or swapped state)
                     if (activities[i].idle){
                         obj.reset();
                     } else if (activities[i].active){
@@ -524,7 +560,8 @@ app.factory("activityService", function() {
             // Recalculates time and sets the timestamp
             var lastDataBlock = activities[index].data.length - 1;
             var currentTime = Date.now();
-                    
+             
+            // math
             activities[index].data[lastDataBlock].time += (currentTime - activities[index].data[lastDataBlock].timestamp);                            
             activities[index].data[lastDataBlock].timestamp = (newTimestamp ? currentTime : 0);
             
@@ -535,6 +572,7 @@ app.factory("activityService", function() {
     return obj;
 });
 
+// Service that handles graph logic
 app.factory("graphService", ["activityService", function(activityService){
 
     var obj = {
@@ -692,321 +730,7 @@ app.factory("graphService", ["activityService", function(activityService){
     return obj;
 }]);
 
-app.service("dataService", function () {
-
-    this.getActivities = function () {
-
-        if (docCookies.hasItem("activities")) {
-
-            var activities = JSON.parse(docCookies.getItem("activities"));
-
-            if (activities.constructor != Array) {
-
-                activities = [activities];
-            }
-
-            activities.sort(
-                function (a, b) {
-                    if (a.name > b.name) { return 1; }
-                    if (b.name < a.name) { return -1; }
-                    return 0;
-                });
-
-            console.log(activities)
-            return activities;
-        }
-
-        return [];
-    }
-    
-    this.getActiveActivity = function(){
-    
-        var activities = this.getActivities();
-        
-        if (activities.length == 0){
-        
-            $(".js-current-activity").text("Not currently tracking time for any activity");
-        } else {
-        
-            for (var i = 0; i < activities.length; i++){
-            
-                if (activities[i].active) {
-                    $(".js-current-activity").text("Tracking time for " + activities[i].name);
-                    
-                    return activities[i].name;
-                }
-            }
-        }
-        
-        return "";
-    }
-
-    this.saveActivity = function (activity) {
-
-        if (!docCookies.hasItem("activities")) {
-
-            docCookies.setItem("activities", [JSON.stringify({ "name": activity, "active": true })], Infinity);
-        } else {
-
-            var activities = this.getActivities();
-
-            for (var i = 0; i < activities.length; i++) {
-                
-                if (activities[i].name == activity) {
-                    throw "Activity already exists";
-                }
-            }
-
-            activities.push({ "name": activity, "active": false });
-            docCookies.setItem("activities", JSON.stringify(activities), Infinity);
-        }
-        
-    };
-
-    this.activateActivity = function (activity) {
-
-        var activities = this.getActivities();
-
-        for (var i = 0; i < activities.length; i++) {
-
-            activities[i].active = false;
-
-            if (activities[i].name == activity.name) {
-
-                activities[i].active = true;
-            }
-        }
-
-        docCookies.setItem("activities", JSON.stringify(activities), Infinity);
-    };
-
-    this.startActivity = function (activity) {
-
-        var activities;
-        var isActivitySaved = false;
-        var currentTime = Date.now();
-        var currentDate = new Date().toJSON();
-
-        if (!docCookies.hasItem("activitiesTime")) {
-
-            activities = {
-                "name": activity.name,
-                data: [{
-                    "date": currentDate,
-                    "time": 0,
-                    "timestamp": currentTime
-                }]
-            };
-
-            activities = [activities];
-        } else {
-
-            activities = JSON.parse(docCookies.getItem("activitiesTime")) || [];
-
-            for (var i = 0;i < activities.length; i++) {
-
-                if (activities[i].name == activity.name) {
-
-                    isActivitySaved = true;
-                    activities[i].data[activities[i].data.length - 1].timestamp = currentTime;
-                } else {
-
-                    if (activities[i].data[activities[i].data.length - 1].timestamp != null) {
-                        activities[i].data[activities[i].data.length - 1].time += (currentTime - activities[i].data[activities[i].data.length - 1].timestamp);
-                    }
-                    
-                    activities[i].data[activities[i].data.length - 1].timestamp = null;
-                }
-            }
-
-            if (!isActivitySaved) {
-
-                activities.push({
-                    "name": activity.name,
-                    data: [{
-                        "date": currentDate,
-                        "time": 0,
-                        "timestamp": currentTime
-                    }]
-                });
-            }            
-        }
-
-        docCookies.setItem("activitiesTime", JSON.stringify(activities), Infinity);
-    };
-
-    this.calculateTime = function () {
-
-        var activities = JSON.parse(docCookies.getItem("activitiesTime")) || [];
-        var currentTime = Date.now();
-        var currentDay = new Date(currentTime);
-        var activityDay;
-
-        for (var i = 0; i < activities.length; i++) {
-
-            activityDay = new Date(activities[i].data[activities[i].data.length - 1].date).setHours(0, 0, 0, 0);
-
-            // If we crossed into the next day
-            if (activityDay != currentDay.setHours(0, 0, 0, 0)) {
-
-                if (activities[i].data.length == 7) {
-                    activities[i].data.shift();
-                }
-
-                activities[i].data.push({ "date": currentDay.toJSON(), "time": 0, "timestamp": currentTime });
-            } else {
-
-                if (activities[i].data[activities[i].data.length - 1].timestamp != null) {
-
-                    activities[i].data[activities[i].data.length - 1].time += (currentTime - activities[i].data[activities[i].data.length - 1].timestamp);
-                    activities[i].data[activities[i].data.length - 1].timestamp = currentTime;
-                }
-            }
-        }
-
-        docCookies.setItem("activitiesTime", JSON.stringify(activities), Infinity);
-    };
-
-    this.formatChartInformation = function (day) {
-
-        /*
-            [{
-                "name": activityName,
-                data: [{
-                    "date": currentDate,
-                    "time": 0,
-                    "timestamp": currentTime
-                }]
-            }];
-        */
-        var rawData = JSON.parse(docCookies.getItem("activitiesTime")) || [];
-
-        var activityTimes = [];
-        var totalActivityTime = 0;
-        var individualActivityTime = 0;
-        var day;
-
-        for (var i = 0; i < rawData.length; i++) {
-
-            for (var j = 0; j < rawData[i].data.length; j++) {
-
-                if (rawData[i].data[j].time > 0) {
-
-                    totalActivityTime += rawData[i].data[j].time;
-                    individualActivityTime += rawData[i].data[j].time;
-
-                    var years = rawData[i].data[j].time / 1000 / 60 / 60 / 24 / 7 / 52;
-                    var weeks = years % 1 * 52;
-                    var days = weeks % 1 * 7;
-                    var hours = days % 1 * 24;
-                    var minutes = hours % 1 * 60;
-                    var seconds = minutes % 1 * 60;
-                    var miliseconds = seconds % 1 * 1000;
-
-                    years = Math.floor(years);
-                    weeks = Math.floor(weeks);
-                    days = Math.floor(days);
-                    hours = Math.floor(hours);
-                    minutes = Math.floor(minutes);
-                    seconds = Math.floor(seconds);
-                    miliseconds = Math.floor(miliseconds);
-
-                    var strTime = "";
-
-                    if (years != 0) { strTime += years + "y - "; }
-                    if (weeks != 0) { strTime += weeks + "w - "; }
-                    if (days != 0) { strTime += days + "d - "; }
-                    if (hours != 0) { strTime += hours + "h - "; }
-                    if (minutes != 0) { strTime += minutes + "m - "; }
-                    if (seconds != 0) { strTime += seconds + "s - "; }
-                    if (miliseconds != 0) { strTime += miliseconds + "ms - "; }
-
-                    if (strTime.length >= 3) {
-
-                        strTime = strTime.substring(0, strTime.length - 3);
-                    }
-
-                    activityTimes.push({
-                        name: rawData[i].name,
-                        time: individualActivityTime,
-                        strTime: strTime
-                    });
-
-                    individualActivityTime = 0;
-                }
-            }
-        }
-
-        activityTimes.push(totalActivityTime);
-
-        return activityTimes;
-    };
-
-    this.buildChart = function (day) {
-
-        var graphObj = {list: []};
-        var graph = {};
-        var graphData = this.formatChartInformation(" ");
-        var activeActivityName = this.getActiveActivity();
-
-        var rowsData = [];
-
-        graph.data = {
-            "cols": [{
-                id: "A",
-                label: "Activity",
-                type: "string"
-            },
-            {
-                id: "B",
-                label: "Time",
-                type: "string"
-            }]
-        }
-
-        for (var i = 0; i < graphData.length - 1; i++) {
-
-            rowsData.push({
-                c: [
-                    { v: graphData[i].name }, // name of activity
-                    {
-                        v: graphData[i].time / graphData[graphData.length - 1] * 100, // % of total time
-                        f: graphData[i].strTime // string representation of time
-                    }
-                ]
-            });
-            
-            graphObj.list.push({
-                name: graphData[i].name,
-                value: Math.floor(graphData[i].time / graphData[graphData.length - 1] * 100),
-                str: graphData[i].strTime,
-                active: (activeActivityName != "" && graphData[i].name == activeActivityName)
-            });
-        }
-
-        graph.data.rows = rowsData;
-        graph.type = "PieChart";
-        graph.options = {            
-            "height": 400,
-            "width": 400,
-            legend: {
-                position: "none"
-            }
-        };
-
-        graphObj.graph = graph;
-        
-        graphObj.list.sort(
-                function (a, b) {
-                    if (a.value > b.value) { return 1; }
-                    if (b.value < a.value) { return -1; }
-                    return 0;
-                });
-        
-        return graphObj;
-    };
-});
-
+// User service that handles login / database logic
 app.factory("user", ["$http", "activityService", function($http, activityService){
     
     var o = {
@@ -1044,6 +768,13 @@ app.factory("user", ["$http", "activityService", function($http, activityService
     return o;
 }]);
 
+
+/*************************************
+/
+/   CONTROLLERS
+/
+/
+*************************************/
 app.controller("userCtrl", ["$scope", "user", function ($scope, user) {
 
     $scope.user = user.user;
