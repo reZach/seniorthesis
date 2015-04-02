@@ -490,6 +490,14 @@ app.factory("activityService", function() {
                 if (activities[i].active) {
                 
                     activities[i].active = false;
+                    
+                    /* Update last timestamp */
+                    var lastDataBlock = activities[i].data.length - 1;
+                    var currentTime = Date.now();
+                    
+                    activities[i].data[lastDataBlock].time += (currentTime - activities[i].data[lastDataBlock].timestamp);                            
+                    activities[i].data[lastDataBlock].timestamp = 0;                            
+                    
                     break;
                 }
             }

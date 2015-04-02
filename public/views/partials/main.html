@@ -3,21 +3,17 @@
     
     <!-- Time Allocation -->
     <div class="row">
-        <div class="col-lg-5 text-center">
+        <div class="col-lg-5 text-center" style="border-right:1px solid black;">
             <h1 class="mainpage-header">Time Allocation</h1>
             <div class="row">
                 <h4>Tracking time for: [ {{activeActivity.val}} ]</h4>
             </div>
             <div class="row">
-                <div>
-                    or switch to <div class="btn btn-default navbar-gray" ng-click="idleSwap()">{{ idleActivity.val }}</div>                    
+                <div class="btn-group">
+                    <div class="btn btn-default navbar-gray" ng-click="idleSwap()">switch to {{ idleActivity.val }}</div>
+                    <div class="btn btn-default navbar-gray" ng-click="reset()" ng-if="activeActivity.val == 'Idle' && idleActivity.val != 'Idle'">reset</div>
+                    <div class="btn btn-default navbar-gray" ng-click="stop()" ng-if="activeActivity.val != '' && activeActivity.val != 'Idle' && idleActivity.val == 'Idle'">stop activity</div>
                 </div>
-            </div>
-            <div class="row vertical-margin" ng-if="activeActivity.val == 'Idle' && idleActivity.val != 'Idle'">
-                or <div class="btn btn-default navbar-gray" ng-click="reset()">reset</div>
-            </div>
-            <div class="row vertical-margin" ng-if="activeActivity.val != '' && activeActivity.val != 'Idle' && idleActivity.val == 'Idle'">
-                or <div class="btn btn-default navbar-gray" ng-click="stop()">stop activity</div>
             </div>
             <div class="row">
                 <div google-chart chart="googlechart" style="margin:0 auto;"/>
