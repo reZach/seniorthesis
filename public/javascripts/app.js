@@ -9,7 +9,7 @@ app.config([
                 views: {
                     "hub": {
                         templateUrl: "/views/partials/main.html" ,
-                        controller: "activityCtrl2"
+                        controller: "activityCtrl"
                     },
                     "accountHub": {
                         templateUrl: "/views/partials/userHub.html",
@@ -468,6 +468,28 @@ app.factory("activityService", function() {
                 if (activities[i].idle) {
                 
                     activities[i].idle = false;
+                    break;
+                }
+            }
+            
+            obj.setActivitiesCookie(activities);
+            
+            // Needed to update controllers properly
+            angular.copy(activities, obj.data.activities);
+            angular.copy({val: "Idle"}, obj.data.idleActivity);
+            angular.copy({val: ""}, obj.data.activeActivity);
+        },
+        
+        // Stops activity (goes back to fresh load state)
+        stop: function(){
+        
+            var activities = obj.getActivities();
+            
+            for (var i = 0; i < activities.length; i++){
+            
+                if (activities[i].active) {
+                
+                    activities[i].active = false;
                     break;
                 }
             }
@@ -993,7 +1015,7 @@ app.factory("user", ["$http", "activityService", function($http, activityService
     return o;
 }]);
 
-app.controller("activityCtrl2", ["$scope", "$interval", "activityService", "graphService", function ($scope, $interval, activityService, graphService) {
+app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graphService", function ($scope, $interval, activityService, graphService) {
 
     $scope.activities = activityService.data.activities;
     activityService.initActivities();
@@ -1001,6 +1023,8 @@ app.controller("activityCtrl2", ["$scope", "$interval", "activityService", "grap
     $scope.googlechart = graphService.data.chart;
     $scope.activeActivity = activityService.data.activeActivity;
     $scope.idleActivity = activityService.data.idleActivity;
+    
+    graphService.createChart("0");
     
     // Creates a new activity
     $scope.newActivity = function(activityName){
@@ -1100,86 +1124,15 @@ app.controller("activityCtrl2", ["$scope", "$interval", "activityService", "grap
         }
     };
     
-}]);
-
-app.controller("activityCtrl", ["$scope", "$interval", "dataService", function ($scope, $interval, dataService) {
+    // Stop activity
+    $scope.stop = function(){
     
-    $scope.newActivity = "";
-    $scope.graphData = {};
-    $scope.activities = dataService.getActivities();
-    
-    dataService.getActiveActivity();
-
-    $scope.save = function (activity) {
-
-        try{
-            if (activity != "") {
-                dataService.saveActivity(activity);
-
-                $scope.newActivity = "";
-                $scope.activities = dataService.getActivities();
-            }
+        try
+        {
+            activityService.stop();
         } catch (e) {
             alert(e);
-        }        
-    }    
-
-    $scope.activate = function activate(activity) {
-
-        dataService.activateActivity(activity);
-    }
-
-    $scope.start = function start(activity) {
-
-        $(".js-current-activity").text("Tracking time for: " + "[" + activity.name + "]");
-
-        dataService.startActivity(activity);
-    }
-
-    $scope.calculateTime = function calculateTime() {
-
-        dataService.calculateTime();
-
-        $(".js-create-graph").attr("disabled", true);
-
-        $interval(function () {
-            dataService.calculateTime();
-        }, 5000);
+        }
     };
-
-    $scope.$watch(function () {
-
-        return docCookies.getItem("activities");
-    }, function (oldVal, newVal) {
-
-        $scope.activities = dataService.getActivities();
-    });
-
-    $scope.$watch(function () {
-
-        return docCookies.getItem("activitiesTime");
-    }, function (oldVal, newVal) {
-
-        var obj = dataService.buildChart();
-        
-        $scope.graphData.graph = obj.graph;
-        $scope.graphData.list = obj.list;
-    });
     
-}]);
-
-
-app.controller("userCtrl", ["$scope", "user", function ($scope, user) {
-
-    $scope.test = "hi";
-    
-    $scope.user = user.user;
-    
-    user.getMe().success(function(a){
-        // to-do?
-    }).error(function(b){
-        // to-do?
-    });
-    
-    user.update();
 }]);
