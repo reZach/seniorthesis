@@ -579,7 +579,8 @@ app.factory("graphService", ["activityService", function(activityService){
         
         // Holds all data
         data: {
-            chart: {}
+            chart: {},
+            details: []
         },
 
         // Creates string representation of an activities' time
@@ -644,9 +645,22 @@ app.factory("graphService", ["activityService", function(activityService){
             chart.options = {            
                 "height": 360,
                 "width": 360,
+                "backgroundColor": "#C1DBF5",
                 legend: {
                     position: "none"
-                }
+                },
+                pieSliceTextStyle: {
+                    color: "black", 
+                    fontName: "Ubuntu, sans-serif", 
+                    fontSize: 12
+                },
+                tooltip: {
+                    textStyle: {
+                        color: "black", 
+                        fontName: "Ubuntu, sans-serif", 
+                        fontSize: 12
+                    }                                    
+                }                    
             };
             
             return chart;
@@ -722,6 +736,8 @@ app.factory("graphService", ["activityService", function(activityService){
                 }
             }
             
+            
+            
             // Needed to update controllers properly
             angular.copy(graph, obj.data.chart);
         }
@@ -794,6 +810,7 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
     activityService.initActivities();
     
     $scope.googlechart = graphService.data.chart;
+    $scope.googlechartdetails = graphService.data.details;
     $scope.activeActivity = activityService.data.activeActivity;
     $scope.idleActivity = activityService.data.idleActivity;
     

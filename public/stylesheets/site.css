@@ -1,7 +1,11 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-family: 'Ubuntu', sans-serif;
+  background-color: #C1DBF5;
 }
+
+h1, h2, h3, h4, h5, h6, p {font-family: 'Ubuntu', sans-serif;}
 
 a {
   color: #00B7FF;

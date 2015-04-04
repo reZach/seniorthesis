@@ -6,24 +6,24 @@
         <div class="col-lg-5 text-center" style="border-right:1px solid black;">
             <h1 class="mainpage-header">Time Allocation</h1>
             <div class="row">
-                <h4>Tracking time for: [ {{activeActivity.val}} ]</h4>
+                <h4>Tracking time for: [ <span style="font-weight:bold;">{{activeActivity.val}}</span> ]</h4>
             </div>
             <div class="row">
                 <div class="btn-group">
-                    <div class="btn btn-default navbar-gray" title="Pause current activity" ng-click="idleSwap()">switch to {{ idleActivity.val }}</div>
+                    <div class="btn btn-default navbar-gray" title="Pause current activity" ng-click="idleSwap()">switch to [ {{ idleActivity.val }} ]</div>
                     <div class="btn btn-default navbar-gray" title="Reset tracking to a fresh state" ng-click="reset()" ng-if="activeActivity.val == 'Idle' && idleActivity.val != 'Idle'">reset</div>
                     <div class="btn btn-default navbar-gray" title="Stop tracking for this activity" ng-click="stop()" ng-if="activeActivity.val != '' && activeActivity.val != 'Idle' && idleActivity.val == 'Idle'">stop activity</div>
                 </div>
             </div>
             <div class="row">
-                <div google-chart chart="googlechart" style="margin:0 auto;"/>
+                <div google-chart chart="googlechart" style="margin-left:68px;"/>
                 <div class="btn btn-success" title="Click to generate a chart" ng-click="generateChart()">Generate chart</div>
                 <div class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
             </div>
             <div class="row">
                 <div class="col-lg-offset-2 col-lg-8">
                     <h4 class="text-left">Details</h4>
-                    <div class="row" ng-class="{'alert-success' : activity.active}" ng-repeat="activity in graphData.list | orderBy: '-value'">
+                    <div class="row" ng-class="{'alert-success' : activity.active}" ng-repeat="activity in googlechartdetails | orderBy: '-value'">
                         <div class="pull-left">{{activity.value}}% {{activity.name}}</div>
                         <div class="pull-right">[{{activity.str}}]</div>
                     </div>
@@ -35,20 +35,27 @@
         <div class="col-lg-7">
             <h1 class="text-center mainpage-header">Activities</h1>
             <div class="row">
-                <form class="text-center" novalidate>
+                <form class="text-center" style="margin-bottom:30px;" novalidate>
                     <input type="text" placeholder="Activity name" ng-model="newActivityName" />
                     <input type="submit" value="Add activity" ng-click="newActivity(newActivityName)" />
                 </form>
             </div>
             <div class="row">
                 <div class="col-lg-offset-2 col-lg-8">
-                    <h4>List</h4>
-                    <div class="row text-center">
-                        <div class="btn btn-primary" title="Start tracking time for the selected activity" ng-click="startSelectedActivity()">Start selected activity</div>
+                    <h4>Activity List</h4>
+                    <div ng-if="activities.length > 0">
+                        <div class="row text-center">
+                            <div class="btn btn-primary" title="Start tracking time for the selected activity" ng-click="startSelectedActivity()">Start selected activity</div>
+                        </div>
+                        <div class="row" ng-repeat="activity in activities | orderBy: 'name'">
+                            <div class="btn btn-default text-left" title="Click to select this activity" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
+                            <div class="btn btn-danger" title="Delete activity and all corresponding data" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
+                        </div>
                     </div>
-                    <div class="row" ng-repeat="activity in activities | orderBy: 'name'">
-                        <div class="btn btn-default text-left" title="Click to select this activity" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
-                        <div class="btn btn-danger" title="Delete activity and all corresponding data" ng-click="deleteActivity(activity.name)" style="float:right;">Delete</div>                        
+                    <div ng-if="activities.length == 0">
+                        <div class="row text-center">
+                            There are no activities found! Add one to get started
+                        </div>
                     </div>
                 </div>
             </div>
