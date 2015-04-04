@@ -55,8 +55,242 @@ app.run(["$rootScope", function ($rootScope) {
 /
 /
 *************************************/
+// Service that controls pie slice colors
+app.factory("pieSliceColorService", function() {
+
+    var obj = {
+    
+        // Holds all data
+        data: {
+            colors: [
+                { color: "Blue", activity: "" },
+                { color: "Red", activity: "" },
+                { color: "Yellow", activity: "" },
+                { color: "Gray", activity: "" },
+                { color: "Pink", activity: "" },
+                { color: "Maroon", activity: "" },
+                { color: "MediumAquaMarine", activity: "" },
+                { color: "MediumSeaGreen", activity: "" },
+                { color: "MistyRose", activity: "" },
+                { color: "Moccasin", activity: "" },
+                { color: "Olive", activity: "" },
+                { color: "Orange", activity: "" },
+                { color: "PaleVioletRed", activity: "" },
+                { color: "RebeccaPurple", activity: "" },
+                { color: "RoyalBlue", activity: "" },
+                { color: "SaddleBrown", activity: "" },
+                { color: "Salmon", activity: "" },
+                { color: "SeaShell", activity: "" },
+                { color: "Black", activity: "" },
+                { color: "SeaGreen", activity: "" },
+                { color: "Silver", activity: "" },
+                { color: "White", activity: "" },
+                { color: "Tan", activity: "" },
+                { color: "Tomato", activity: "" },
+                { color: "Turquoise", activity: "" },
+                { color: "Wheat", activity: "" },
+                { color: "WhiteSmoke", activity: "" },
+                { color: "DimGray", activity: "" },
+                { color: "DeepPink", activity: "" },
+                { color: "DarkKhaki", activity: "" },
+                { color: "DarkGoldenRod", activity: "" },
+                { color: "DarkCyan", activity: "" },
+                { color: "Crimson", activity: "" },
+                { color: "CornflowerBlue", activity: "" },
+                { color: "Coral", activity: "" },
+                { color: "Chocolate", activity: "" },
+                { color: "Chartreuse", activity: "" },
+                { color: "BurlyWood", activity: "" },
+                { color: "BlanchedAlmond", activity: "" },
+                { color: "Beige", activity: "" },
+                { color: "Azure", activity: "" },
+                { color: "AliceBlue", activity: "" },
+                { color: "AntiqueWhite", activity: "" }
+                /*{ slice: 43, color: "blue", activity: "" },
+                { slice: 44, color: "blue", activity: "" },
+                { slice: 45, color: "blue", activity: "" },
+                { slice: 46, color: "blue", activity: "" },
+                { slice: 47, color: "blue", activity: "" },
+                { slice: 48, color: "blue", activity: "" },
+                { slice: 49, color: "blue", activity: "" },
+                { slice: 50, color: "blue", activity: "" },
+                { slice: 51, color: "blue", activity: "" },
+                { slice: 52, color: "blue", activity: "" },
+                { slice: 53, color: "blue", activity: "" },
+                { slice: 54, color: "blue", activity: "" },
+                { slice: 55, color: "blue", activity: "" },
+                { slice: 56, color: "blue", activity: "" },
+                { slice: 57, color: "blue", activity: "" },
+                { slice: 58, color: "blue", activity: "" },
+                { slice: 59, color: "blue", activity: "" },
+                { slice: 60, color: "blue", activity: "" },
+                { slice: 61, color: "blue", activity: "" },
+                { slice: 62, color: "blue", activity: "" },
+                { slice: 63, color: "blue", activity: "" },
+                { slice: 64, color: "blue", activity: "" },
+                { slice: 65, color: "blue", activity: "" },
+                { slice: 66, color: "blue", activity: "" },
+                { slice: 67, color: "blue", activity: "" },
+                { slice: 68, color: "blue", activity: "" },
+                { slice: 69, color: "blue", activity: "" },
+                { slice: 70, color: "blue", activity: "" },
+                { slice: 71, color: "blue", activity: "" },
+                { slice: 72, color: "blue", activity: "" },
+                { slice: 73, color: "blue", activity: "" },
+                { slice: 74, color: "blue", activity: "" },
+                { slice: 75, color: "blue", activity: "" },
+                { slice: 76, color: "blue", activity: "" },
+                { slice: 77, color: "blue", activity: "" },
+                { slice: 78, color: "blue", activity: "" },
+                { slice: 79, color: "blue", activity: "" },
+                { slice: 80, color: "blue", activity: "" },
+                { slice: 81, color: "blue", activity: "" },
+                { slice: 82, color: "blue", activity: "" },
+                { slice: 83, color: "blue", activity: "" },
+                { slice: 84, color: "blue", activity: "" },
+                { slice: 85, color: "blue", activity: "" },
+                { slice: 86, color: "blue", activity: "" },
+                { slice: 87, color: "blue", activity: "" },
+                { slice: 88, color: "blue", activity: "" },
+                { slice: 89, color: "blue", activity: "" },
+                { slice: 90, color: "blue", activity: "" },
+                { slice: 91, color: "blue", activity: "" },
+                { slice: 92, color: "blue", activity: "" },
+                { slice: 93, color: "blue", activity: "" },
+                { slice: 94, color: "blue", activity: "" },
+                { slice: 95, color: "blue", activity: "" },
+                { slice: 96, color: "blue", activity: "" },
+                { slice: 97, color: "blue", activity: "" },
+                { slice: 98, color: "blue", activity: "" },
+                { slice: 99, color: "blue", activity: "" },
+                { slice: 100, color: "blue", activity: "" },*/
+            ]
+        },
+
+        // Inits colors
+        init: function(){
+        
+            var cookieColors = obj.getColors();
+            
+            // If we don't have any activities
+            if (cookieColors.length == 0){
+            
+                var colors = obj.data.colors;
+             
+                // Assign the cookie
+                obj.setColorsCookie(colors);
+            } else {
+            
+                angular.copy(cookieColors, obj.data.colors);
+            }
+        },
+        
+        // Sets cookie
+        setColorsCookie: function(colors){
+            docCookies.setItem("activityColors", JSON.stringify(colors), Infinity);
+        },
+        
+        // Sorts colors and removes empty colors
+        sortColorsRemoveEmpty: function(colors){
+        
+            for (var i = 0; i < colors.length; i++){
+            
+                if (colors[i].activity === ""){
+                
+                    colors.splice(i,1);
+                    i = i - 1;
+                }
+            }
+            
+            // Sort alphabetically by activity name
+            colors.sort(
+                function (a, b) {
+                    if (a.activity > b.activity) { return 1; }
+                    if (b.activity < a.activity) { return -1; }
+                    return 0;
+                });
+                
+            return colors;
+        },        
+        
+        // Gets colors
+        getColors: function(){
+        
+            if (docCookies.hasItem("activityColors")) {
+
+                var colors = JSON.parse(docCookies.getItem("activityColors"));
+
+                // Cast into an array if not already an array
+                if (colors.constructor != Array) {
+
+                    colors = [colors];
+                }                
+
+                return colors;
+            }
+
+            return [];
+        },
+        
+        // Assigns color to an activity
+        assignColor: function(activityName){
+        
+            var pieSliceIndex = -1;
+            var found = false;
+            var colors = obj.getColors();
+            
+            // Search for open colors for the activity
+            for (var i = 0; i < colors.length; i++){
+            
+                // If this color is unassigned
+                if (colors[i].activity === "" && pieSliceIndex == -1) {
+                    pieSliceIndex = i;
+                } else if (colors[i].activity === activityName) {
+                    found = true;
+                }
+            }
+            
+            // Throw errors
+            if (pieSliceIndex == -1){
+                throw "Cannot find an unused color for the activity";
+            }                       
+            
+            
+            if (pieSliceIndex != -1 && !found) {
+            
+                colors[pieSliceIndex].activity = activityName;
+            }
+            
+            // Re-assign objects
+            obj.setColorsCookie(colors);
+            angular.copy(colors, obj.data.colors);
+        },
+        
+        // Dissociates color and activity
+        dissociate: function(activityName){
+        
+            var colors = obj.getColors();
+            
+            for (var i = 0; i < colors.length; i++){
+            
+                if (colors[i].activity === activityName){
+                    colors[i].activity = "";
+                    break;
+                }
+            }
+            
+            // Re-assign objects
+            obj.setColorsCookie(colors);
+            angular.copy(colors, obj.data.colors);
+        }
+    };
+    
+    return obj;
+});
+
+
 // Service that handles activities
-app.factory("activityService", function() {
+app.factory("activityService", ["pieSliceColorService", function(pieSliceColorService) {
     
     var obj = {
         
@@ -167,6 +401,8 @@ app.factory("activityService", function() {
                     })], 
                     Infinity);
                     
+                pieSliceColorService.assignColor(activityName);
+                    
                 activities = obj.getActivities();               
             } else {
 
@@ -187,6 +423,8 @@ app.factory("activityService", function() {
                     idle: false,
                     data: []
                 });
+                
+                pieSliceColorService.assignColor(activityName);
                 
                 obj.setActivitiesCookie(activities);                       
             }
@@ -401,6 +639,7 @@ app.factory("activityService", function() {
                     
                     // Remove activity
                     activities.splice(i, 1);
+                    pieSliceColorService.dissociate(activityName);
                     
                     break;
                 }
@@ -570,10 +809,10 @@ app.factory("activityService", function() {
     };
     
     return obj;
-});
+}]);
 
 // Service that handles graph logic
-app.factory("graphService", ["activityService", function(activityService){
+app.factory("graphService", ["activityService", "pieSliceColorService", function(activityService, pieSliceColorService){
 
     var obj = {
         
@@ -736,10 +975,30 @@ app.factory("graphService", ["activityService", function(activityService){
                 }
             }
             
-            
+            // Pie slice colors
+            graph.options.slices = obj.buildSliceColors();
             
             // Needed to update controllers properly
             angular.copy(graph, obj.data.chart);
+        },
+        
+        // Build pie slice colors
+        buildSliceColors: function(){
+        
+            var colors = pieSliceColorService.getColors();
+            colors = pieSliceColorService.sortColorsRemoveEmpty(colors);
+        
+            var slices = {};
+            
+            // Create slices
+            for (var i = 0; i < colors.length; i++){
+            
+                slices[i] = {
+                    color: colors[i].color
+                };
+            }
+            
+            return slices;
         }
     };
     
@@ -804,10 +1063,11 @@ app.controller("userCtrl", ["$scope", "user", function ($scope, user) {
     user.update();
  }]);
 
-app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graphService", function ($scope, $interval, activityService, graphService) {
+app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graphService", "pieSliceColorService", function ($scope, $interval, activityService, graphService, pieSliceColorService) {
 
     $scope.activities = activityService.data.activities;
     activityService.initActivities();
+    pieSliceColorService.init();
     
     $scope.googlechart = graphService.data.chart;
     $scope.googlechartdetails = graphService.data.details;
