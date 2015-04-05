@@ -971,15 +971,58 @@ app.factory("graphService", ["activityService", "pieSliceColorService", function
             if (data.length != 0) {
                 for (var i = 0; i < graph.data.rows.length; i++){
                     
-                    graph.data.rows[i].c[1].v = graph.data.rows[i].c[1].v / totalActivityTime * 100;
+                    graph.data.rows[i].c[1].v = Math.floor(graph.data.rows[i].c[1].v / totalActivityTime * 100);
                 }
             }
             
             // Pie slice colors
             graph.options.slices = obj.buildSliceColors();
             
+            // Set chart details
+            obj.setChartDetails(graph);
+            
             // Needed to update controllers properly
             angular.copy(graph, obj.data.chart);
+        },
+        
+        // Sets details of the chart for other display
+        setChartDetails: function(graph){
+        
+            /*
+                Note: 'day' will represent the day
+                in string format of the day we want to 
+                generate a graph for
+                
+                '0'                 = today
+                '-1'                = yesterday
+                '-2'                = 2 days ago
+                '-3'                = 3 days ago
+            */
+            
+            // Get chart details
+            var details = [], item;
+            
+            for (var i = 0; i < graph.data.rows.length; i++){
+            
+                item = graph.data.rows[i].c;
+                
+                details.push({
+                    value: item[1].v,
+                    name: item[0].v,
+                    str: item[1].f
+                });
+            }
+            
+            // Sort details
+            details.sort(
+                function (a, b) {
+                    if (a.value > b.value) { return 1; }
+                    if (b.value < a.value) { return -1; }
+                    return 0;
+                });
+                
+            // Assign details
+            angular.copy(details, obj.data.details);
         },
         
         // Build pie slice colors
@@ -1143,7 +1186,7 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
             
             $interval(function(){
 
-                graphService.createChart("0");                
+                graphService.createChart("0");
             }, 5000);
         } catch (e) {
             $(".js-autogenerate-chart").removeClass("fa-pulse active");
