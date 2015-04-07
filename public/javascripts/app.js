@@ -587,18 +587,33 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                         
                     } else if (currentDate > activityDataDate && activities[i].data.length - 1 == j){
                  
-                        // REDO
                         // 86400000 milliseconds in a day                                        
 
                         var numberOfDays = Math.floor((currentDate - activityDataDate) / 86400000);
                  
-                        for (var k = 0; k < numberOfDays; k++){
+                        // If our activity has been active for over a day
+                        // Increment time of activity for given number of days
+                        if (numberOfDays > 1){
+                            for (var k = 0; k < numberOfDays; k++){
+                            
+                                activities[i].data.push({
+                                    date: activityDataDate + ((k + 1)*86400000), // Gets proper milliseconds for the day to represent the date
+                                    time: (activities[i].active ? 86400000 : 0), // If activity was active, set to max time. Otherwise set to 0
+                                    timestamp: 0 
+                                });
+                            }
+                        } else if (numberOfDays == 1){
                         
-                            activities[i].data.push({
-                                date: activityDataDate + ((k + 1)*86400000),
-                                time: (activities[i].active ? 86400000 : 0),
-                                timestamp: 0
-                            });
+                            // Calculate time (less than a day's worth)
+                            if (activities[i].data[j].timestamp != 0){
+                            
+                                // Get time of the end of the last day
+                                var date = new Date(activities[i].data[j].timestamp).setHours(23, 59, 59, 999);
+                                
+                                // Calculate the time
+                                activities[i].data[j].time += date - activities[i].data[j].timestamp;
+                                activities[i].data[j].timestamp = 0;
+                            }                            
                         }
                  
                         if (activities[i].active){
