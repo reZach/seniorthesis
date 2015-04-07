@@ -496,7 +496,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
             
             var dataBlock; // Holds reference to data block we will be modifying
             var currentTime = Date.now();
-            var currentDate = new Date().toJSON();            
+            var currentDate = new Date().setHours(0, 0, 0, 0);            
             
             if (selectedActivity.data.length == 0){ // This activity hasn't been started before
             
@@ -515,7 +515,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                 
                 
                 var activityDataDate;
-                currentDate = new Date(currentTime);
+                currentDate = new Date(currentTime).setHours(0, 0, 0, 0);
                 
                 // Look at the most recent data block                                
                 dataBlock = selectedActivity.data[selectedActivity.data.length - 1];                    
@@ -524,7 +524,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                 // If the current date is greater than the
                 // date of the data block, we need to create
                 // a new data block for this activity
-                if (currentDate.setHours(0, 0, 0, 0) > activityDataDate){
+                if (currentDate > activityDataDate){
                 
                     // Create new data block
                     selectedActivity.data.push({
@@ -535,7 +535,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                 } 
 
                 // If date of the data block is today
-                else if (currentDate.setHours(0, 0, 0, 0) == activityDataDate){
+                else if (currentDate == activityDataDate){
                     
                     // Update the latest data block
                     if (selectedActivity.data[selectedActivity.data.length - 1].timestamp != 0){
@@ -560,7 +560,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
         
             var activities = obj.getActivities();
             var currentTime = Date.now();
-            var currentDate = new Date(currentTime);
+            var currentDate = new Date(currentTime).setHours(0, 0, 0, 0);
             var activityDataDate;
             
             // Loop through all activities
@@ -573,19 +573,53 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                     
                     // If the date of the data block and the current day are the same,
                     // we don't have to make a new data block
-                    if (currentDate.setHours(0, 0, 0, 0) == activityDataDate){
+                    if (currentDate == activityDataDate){
                     
                         // Don't calculate anything if there is no need to
                         if (activities[i].data[j].timestamp != 0){
                         
                             activities[i].data[j].time += (currentTime - activities[i].data[j].timestamp);
-                            
-                            // Our timestamp is re-assigned to the current time
-                            // if the activity is active, otherwise it is set to zero
-                            activities[i].data[j].timestamp = (activities[i].active ? currentTime : 0);                            
                         }
-                    } else if (currentDate.setHours(0, 0, 0, 0) > activityDataDate){
+                        
+                        // Our timestamp is re-assigned to the current time
+                        // if the activity is active, otherwise it is set to zero
+                        activities[i].data[j].timestamp = (activities[i].active ? currentTime : 0);
+                        
+                    } else if (currentDate > activityDataDate && activities[i].data.length - 1 == j){
                  
+                        // REDO
+                        // 86400000 milliseconds in a day                                        
+
+                        var numberOfDays = Math.floor((currentDate - activityDataDate) / 86400000);
+                 
+                        for (var k = 0; k < numberOfDays; k++){
+                        
+                            activities[i].data.push({
+                                date: activityDataDate + ((k + 1)*86400000),
+                                time: (activities[i].active ? 86400000 : 0),
+                                timestamp: 0
+                            });
+                        }
+                 
+                        if (activities[i].active){
+
+                            activities[i].data.push({
+                                date: currentDate,
+                                time: currentDate - new Date(currentDate).setHours(0, 0, 0, 0),
+                                timestamp: currentTime
+                            });
+                        } else {
+                        
+                            activities[i].data.push({
+                                date: currentDate,
+                                time: 0,
+                                timestamp: 0
+                            });
+                        }
+                        
+
+                        /*
+                        
                         // Since the current day has passed the last recorded day for the activity,
                         // we need to calculate the time that hasn't been accounted for the previous
                         // day before we calculate the time for the current day
@@ -598,7 +632,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                         activities[i].data[j].timestamp = 0;
                         
                         // Make a new data block for the current day
-                        var newDataBlockDate = new Date().toJSON();
+                        var newDataBlockDate = new Date().setHours(0, 0, 0, 0);
                         var newDataBlockTime = currentTime - currentDate.setHours(0, 0, 0, 0);
                         
                         activities[i].data.push({
@@ -606,8 +640,10 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                             time: newDataBlockTime,
                             timestamp: (activities[i].active ? currentTime : 0) // Set to currentTime if active, otherwise it is zero
                         });
+                        
+                        */
                     }
-                }                
+                }
             }
             
             obj.setActivitiesCookie(activities);
