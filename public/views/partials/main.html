@@ -18,7 +18,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="activity in googlechartdetails | orderBy: '-value'">
+                                    <tr ng-repeat="activity in googlechartdetails | orderBy: '-value'" ng-if="activity.value">
                                         <td>{{activity.value}}%</td>
                                         <td>{{activity.name}}</td>
                                         <td ng-if="activity.str != ''">[{{activity.str}}]</td>
@@ -29,7 +29,7 @@
                         </div>
                         <div ng-if="googlechartdetails.length == 0">
                             No details to show
-                        </div>                        
+                        </div>
                     </div>
                 </div>                
             </div>
@@ -50,6 +50,12 @@
             </div>
             <div class="row">
                 <div google-chart chart="googlechart" style="margin-left:-23px;"/>
+            </div>
+            <div class="row vertical-margin">
+                <div class="btn btn-default" title="Previous day" ng-click="previousDay()"><i class="fa fa-angle-left"></i></div>
+                <div class="btn btn-default" title="Next day" ng-click="nextDay()"><i class="fa fa-angle-right"></i></div>
+            </div>
+            <div class="row">
                 <div class="btn btn-success" title="Click to generate a chart" ng-click="generateChart()">Generate chart</div>
                 <div class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
             </div>
@@ -140,6 +146,12 @@
             </div>
             <div class="row">
                 <div google-chart chart="googlechart" style="margin-left:185px;"/>
+            </div>
+            <div class="row vertical-margin">
+                <div class="btn btn-default" title="Previous day" ng-click="previousDay()"><i class="fa fa-angle-left"></i></div>
+                <div class="btn btn-default" title="Next day" ng-click="nextDay()"><i class="fa fa-angle-right"></i></div>
+            </div>
+            <div class="row">
                 <div class="btn btn-success" title="Click to generate a chart" ng-click="generateChart()">Generate chart</div>
                 <div class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
             </div>
@@ -237,6 +249,12 @@
             </div>
             <div class="row">
                 <div google-chart chart="googlechart" style="margin-left:-43px;"/>
+            </div>
+            <div class="row vertical-margin">
+                <div class="btn btn-default" title="Previous day" ng-click="previousDay()"><i class="fa fa-angle-left"></i></div>
+                <div class="btn btn-default" title="Next day" ng-click="nextDay()"><i class="fa fa-angle-right"></i></div>
+            </div>
+            <div class="row">
                 <div class="btn btn-success" title="Click to generate a chart" ng-click="generateChart()">Generate chart</div>
                 <div class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
             </div>

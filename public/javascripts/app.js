@@ -325,7 +325,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                 }
                                 
                 // Start the selected activity
-                if (activities[i].selected){
+                if (activities[i].active){
                     obj.selectActivity(activities[i].name);
                     activities = obj.getActivities();
                     
@@ -511,8 +511,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
             
                 // We may need to add a new data block
                 // if the most recent data block doesn't
-                // belong to the current day
-                
+                // belong to the current day                
                 
                 var activityDataDate;
                 currentDate = new Date(currentTime).setHours(0, 0, 0, 0);
@@ -529,7 +528,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                     // Create new data block
                     selectedActivity.data.push({
                         time: 0,
-                        date: currentDate.toJSON(),
+                        date: currentDate,
                         timestamp: currentTime
                     });
                 } 
@@ -631,32 +630,6 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                                 timestamp: 0
                             });
                         }
-                        
-
-                        /*
-                        
-                        // Since the current day has passed the last recorded day for the activity,
-                        // we need to calculate the time that hasn't been accounted for the previous
-                        // day before we calculate the time for the current day
-                        
-                        // Get the time of the end of the last recorded day
-                        var endOfActivityDataDate = new Date(activities[i].data[j].date).setHours(23, 59, 59, 999);
-                        var addToDataBlock = endOfActivityDataDate - activityDataDate;
-                        
-                        activities[i].data[j].time += addToDataBlock;
-                        activities[i].data[j].timestamp = 0;
-                        
-                        // Make a new data block for the current day
-                        var newDataBlockDate = new Date().setHours(0, 0, 0, 0);
-                        var newDataBlockTime = currentTime - currentDate.setHours(0, 0, 0, 0);
-                        
-                        activities[i].data.push({
-                            date: newDataBlockDate,
-                            time: newDataBlockTime,
-                            timestamp: (activities[i].active ? currentTime : 0) // Set to currentTime if active, otherwise it is zero
-                        });
-                        
-                        */
                     }
                 }
             }
@@ -911,9 +884,26 @@ app.factory("graphService", ["activityService", "pieSliceColorService", function
         },
         
         // Initialize constants for google-chart
-        initChart: function(){
+        initChart: function(day){
         
             var chart = {};
+            var graphTitle;
+            var currentDay = new Date().setHours(0, 0, 0, 0);
+                        
+            // Fix up representation of day with the graph
+            currentDay = currentDay - ((day * -1) * 86400000);
+            
+            if (day == 0) {
+                graphTitle = "Today";
+            }
+            else if (day == -1){
+                graphTitle = "Yesterday";
+            } else if (day < -1) {
+                graphTitle = (day * -1) + " days ago";     
+            }
+            
+            currentDay = new Date(currentDay);
+            graphTitle += " (" + (currentDay.getMonth() + 1) + "/" + currentDay.getDate() + "/" + (currentDay.getFullYear() % 100) + ")";
             
             // Initialize all data for our chart
             // that we can ( minus activity data )            
@@ -933,13 +923,19 @@ app.factory("graphService", ["activityService", "pieSliceColorService", function
             
             chart.type = "PieChart";
             chart.options = {            
-                "height": 360,
-                "width": 360,
-                "backgroundColor": "#C1DBF5",
+                height: 360,
+                width: 360,
+                backgroundColor: "#C1DBF5",
+                title: graphTitle,
                 legend: {
                     position: "none"
                 },
                 pieSliceTextStyle: {
+                    color: "black", 
+                    fontName: "Ubuntu, sans-serif", 
+                    fontSize: 12
+                },
+                titleTextStyle: {
                     color: "black", 
                     fontName: "Ubuntu, sans-serif", 
                     fontSize: 12
@@ -973,10 +969,11 @@ app.factory("graphService", ["activityService", "pieSliceColorService", function
             activityService.recalculateActivityTimes();
             
             
-            var graph = obj.initChart();
+            var graph = obj.initChart(day);
             var data = activityService.getActivities();
             var tempDate = new Date(); tempDate = tempDate.setHours(0, 0, 0, 0);
             var dayInMilliseconds = 1000 * 3600 * 24;
+            var currentDate = new Date(Date.now()).setHours(0, 0, 0, 0);
             var dataBlockDate;
             
             var totalActivityTime = 0;
@@ -1167,8 +1164,9 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
     $scope.googlechartdetails = graphService.data.details;
     $scope.activeActivity = activityService.data.activeActivity;
     $scope.idleActivity = activityService.data.idleActivity;
+    $scope.graphDay = "0";
     
-    graphService.createChart("0");
+    graphService.createChart($scope.graphDay);
     
     // Creates a new activity
     $scope.newActivity = function(activityName){
@@ -1214,12 +1212,30 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
         }
     };
     
+    // Goes to the previous day
+    $scope.previousDay = function(){
+    
+        $scope.graphDay = $scope.graphDay - 1;
+        
+        $scope.generateChart();
+    };
+    
+    // Goes forward a day
+    $scope.nextDay = function(){
+        
+        if ($scope.graphDay < 0){
+            $scope.graphDay = $scope.graphDay + 1;
+        }
+        
+        $scope.generateChart();
+    };
+    
     // Generates the chart
     $scope.generateChart = function(){
         
         try
         {
-            graphService.createChart("0");
+            graphService.createChart($scope.graphDay);
         } catch (e) {
             alert(e);
         }
@@ -1233,11 +1249,11 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
         
         try
         {
-            graphService.createChart("0");
+            graphService.createChart($scope.graphDay);
             
             $interval(function(){
 
-                graphService.createChart("0");
+                graphService.createChart($scope.graphDay);
             }, 5000);
         } catch (e) {
             $(".js-autogenerate-chart").removeClass("fa-pulse active");
