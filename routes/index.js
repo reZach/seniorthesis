@@ -51,11 +51,9 @@ module.exports = function(passport){
         if (req.isAuthenticated()){
         
             var user = req.user;
-            var activities = req.body;
-            
+            var activities = JSON.parse(req.cookies.activities);
             
             console.log(activities);
-            res.send(activities);
             
             User.findOne({
                 'googleId': user.googleId
@@ -64,33 +62,33 @@ module.exports = function(passport){
                     return done(err);
                 }
                 
-                // No user was found
-                /*
+                // User was found
+                
                 if (user) {
                     
-                    console.log("activities -->", activities);
+                    //console.log("activities -->", activities);
                     
-                    for (var i = 0; i < activities.data.length; i++){ // Loop through activities
+                    for (var i = 0; i < activities.length; i++){ // Loop through activities
                     
                         var singleActivity = new Activity({
                             name: activities[i].name,
+                            active: activities[i].active,
+                            selected: activities[i].selected,
+                            idle: activities[i].idle,
                             data: []
-                        });
-                                                
-                        var dataArray = [];
+                        });                                                
                         
-                        for (var j = 0; j < singleActivity.data.length; j++){ // Loop through data
+                        
+                        for (var j = 0; j < activities[i].data.length; j++){ // Loop through data
                    
                             var data = new Data({
-                                date: singleActivity.data[j].date,
-                                time: singleActivity.data[j].time,
-                                timestamp: singleActivity.data[j].timestamp
+                                date: activities[i].data[j].date,
+                                time: activities[i].data[j].time,
+                                timestamp: activities[i].data[j].timestamp
                             });
                             
                             singleActivity.data.push(data);
-                        }
-                        
-                        singleActivity.data = dataArray;
+                        }                        
                         
                         user.data.push(singleActivity);
                     }
@@ -104,12 +102,12 @@ module.exports = function(passport){
                     });
                 } else {
                     console.log('User was not found');
-                }*/
+                }
             });
         
         
         } else {
-            console.log("Could not save user");            
+            console.log("Request isn't authenticated");            
         }
     });
     

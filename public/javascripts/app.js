@@ -1114,17 +1114,9 @@ app.factory("user", ["$http", "activityService", function($http, activityService
         },
         update: function() {
         
-            debugger;
-            var obj = activityService.getActivities();
-            
-            var promise = $http.post('/update', obj, {
-                transformRequest: function(data, headersGetter){
-                    return JSON.stringify(data);
-                },
-                transformResponse: function(data, headersGetter){
-                    return JSON.stringify(data);
-                }
-            });
+            var obj = activityService.getActivities();            
+                
+            var promise = $http.post('/update', obj);
             
             return promise;
         }
