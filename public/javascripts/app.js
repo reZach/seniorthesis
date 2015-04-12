@@ -24,16 +24,17 @@ app.config([
                         }
                     }
                 }
+            )
             .state("options",
                 {
                     url: "/options",
                     views: {
                         "hub": {
                             templateUrl: "/views/partials/options.html" ,
-                            controller: "activityCtrl"
+                            controller: "optionsCtrl"
                         },
                         "accountHub": {
-                            templateUrl: "/views/partials/userHub.html",
+                            templateUrl: "/views/partials/userHubOptions.html",
                             controller: "userCtrl"
                         }
                     }
@@ -1158,7 +1159,7 @@ app.controller("userCtrl", ["$scope", "user", function ($scope, user) {
         // to-do?
     });
      
-    user.update();
+    //user.update();
  }]);
 
 app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graphService", "pieSliceColorService", function ($scope, $interval, activityService, graphService, pieSliceColorService) {
@@ -1303,4 +1304,9 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
         }
     };
     
+}]);
+
+app.controller("optionsCtrl", ["$scope", function($scope) {
+
+
 }]);

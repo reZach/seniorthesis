@@ -13,10 +13,9 @@ function ensureAuthenticated(req, res) {
 module.exports = function(passport){
 
     // Home
-    router.get("/", function(req, res){
-    
+    router.get("/", function(req, res){    
         res.render("index", {title: "Express"});
-    });
+    });    
     
     // Google authenticate
     router.get('/auth/google',
