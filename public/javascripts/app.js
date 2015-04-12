@@ -9,22 +9,37 @@ var app = angular.module("myapp", ["googlechart", "ui.router"]);
 *************************************/
 app.config([
     "$stateProvider", "$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
-        $stateProvider.state("index",
-            {
-                url: "/index",
-                views: {
-                    "hub": {
-                        templateUrl: "/views/partials/main.html" ,
-                        controller: "activityCtrl"
-                    },
-                    "accountHub": {
-                        templateUrl: "/views/partials/userHub.html",
-                        controller: "userCtrl"
+        $stateProvider
+            .state("index",
+                {
+                    url: "/index",
+                    views: {
+                        "hub": {
+                            templateUrl: "/views/partials/main.html" ,
+                            controller: "activityCtrl"
+                        },
+                        "accountHub": {
+                            templateUrl: "/views/partials/userHub.html",
+                            controller: "userCtrl"
+                        }
                     }
                 }
-            });
-            
-        // to-do, other views
+            .state("options",
+                {
+                    url: "/options",
+                    views: {
+                        "hub": {
+                            templateUrl: "/views/partials/options.html" ,
+                            controller: "activityCtrl"
+                        },
+                        "accountHub": {
+                            templateUrl: "/views/partials/userHub.html",
+                            controller: "userCtrl"
+                        }
+                    }
+                }
+        );
+        
             
         $urlRouterProvider.otherwise("index");
     }

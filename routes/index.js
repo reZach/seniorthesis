@@ -78,6 +78,9 @@ module.exports = function(passport){
                             data: []
                         });                                                
                         
+                        console.log("Activity: ");
+                        console.log("name:", singleActivity.name);
+                        
                         
                         for (var j = 0; j < activities[i].data.length; j++){ // Loop through data
                    
@@ -88,7 +91,7 @@ module.exports = function(passport){
                             });
                             
                             singleActivity.data.push(data);
-                        }                        
+                        }
                         
                         user.data.push(singleActivity);
                     }
