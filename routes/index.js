@@ -42,7 +42,41 @@ module.exports = function(passport){
             return res.json(req.user);
         }
         
-        return res.status(400).json({});
+        return res.status(401).json({});
+    });
+    
+    router.get('/activitydata', function(req, res){
+    
+        console.log("In method");
+        
+        if (req.isAuthenticated()){
+        
+            console.log("is authenticated");
+            
+            var user = req.user;
+            
+            console.log(user);
+                                   
+            User.findOne({
+                "googleId": user.googleId
+            }).deepPopulate(['data'], function (err, user){
+                if (err) {
+                    console.log("error: ");
+                    console.log(err);
+                    
+                    return done(err);
+                }
+                
+                console.log("sending back user");
+                //return res.end(JSON.stringify(user));
+                return res.end(user);
+            });
+        } else {
+        
+            console.log("is not authenticated");
+            
+            return res.status(401).json({});
+        }
     });
 
     router.post('/update', function(req, res) {
@@ -50,9 +84,15 @@ module.exports = function(passport){
         if (req.isAuthenticated()){
         
             var user = req.user;
+            var colors = JSON.parse(req.cookies.activityColors);
             var activities = JSON.parse(req.cookies.activities);
             
+            // TESTS
+            /*
+            console.log(colors);
             console.log(activities);
+            */
+                       
             
             User.findOne({
                 'googleId': user.googleId
@@ -61,11 +101,10 @@ module.exports = function(passport){
                     return done(err);
                 }
                 
-                // User was found
-                
+                // User was found                
                 if (user) {
                     
-                    //console.log("activities -->", activities);
+                    user.markModified('data');
                     
                     for (var i = 0; i < activities.length; i++){ // Loop through activities
                     
@@ -77,9 +116,7 @@ module.exports = function(passport){
                             data: []
                         });                                                
                         
-                        console.log("Activity: ");
-                        console.log("name:", singleActivity.name);
-                        
+                        singleActivity.markModified('data');
                         
                         for (var j = 0; j < activities[i].data.length; j++){ // Loop through data
                    
@@ -101,15 +138,18 @@ module.exports = function(passport){
                         }
                         
                         console.log('User information updated');
+                        res.send("success");
                     });
                 } else {
                     console.log('User was not found');
+                    res.send("user was not found");
                 }
             });
         
         
-        } else {
-            console.log("Request isn't authenticated");            
+        } else {        
+            console.log("Request isn't authenticated");
+            res.send("request wasn't authenticated");
         }
     });
     

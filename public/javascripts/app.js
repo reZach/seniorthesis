@@ -1128,11 +1128,19 @@ app.factory("user", ["$http", "activityService", function($http, activityService
             
             return promise;
         },
-        update: function() {
+        upload: function() {
+                     
+            var promise = $http.post('/update');
+            
+            return promise;
+        },
+        download: function() {
         
-            var obj = activityService.getActivities();            
-                
-            var promise = $http.post('/update', obj);
+            var promise = $http.get("/activitydata");
+            
+            promise.success(function(obj){
+                alert(JSON.parse(obj));
+            });
             
             return promise;
         }
@@ -1153,13 +1161,32 @@ app.controller("userCtrl", ["$scope", "user", function ($scope, user) {
 
     $scope.user = user.user;
     
+    $scope.cloudDownload = function(){
+    
+        try
+        {
+            user.download();
+        } catch (e) {
+            alert(e);
+        }        
+    };
+    
+    $scope.cloudUpload = function(){
+    
+        try
+        {
+            user.upload();
+        } catch (e) {
+            alert(e);
+        }
+    };
+    
     user.getMe().success(function(a){
         // to-do?
     }).error(function(b){
         // to-do?
     });
-     
-    //user.update();
+         
  }]);
 
 app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graphService", "pieSliceColorService", function ($scope, $interval, activityService, graphService, pieSliceColorService) {
@@ -1308,5 +1335,13 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
 
 app.controller("optionsCtrl", ["$scope", function($scope) {
 
+    // Deletes all cookie data
+    $scope.deleteAllData = function(){
+    
+        docCookies.removeItem("activities", "", "127.0.0.1");
+        docCookies.removeItem("activityColors", "", "127.0.0.1");
+        
+        alert("All data was deleted");
+    };
 
 }]);

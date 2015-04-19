@@ -5,14 +5,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="/index">Balance</a>
+    <a class="navbar-brand" href="/">Balance</a>
     
     <!-- Collapsed content -->
     <div class="collapse navbar-collapse" id="navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
             <li ng-if="!user.name"><a href="/auth/google"><i class="fa fa-sign-in"></i> Google</a></li>            
             <li ng-if="user.name"><a>Logged in as: {{user.name}}</a></li>
-            <li ng-if="user.name"><a href="/"><i class="fa fa-wifi"> Sync</i></a></li>
+            <li ng-if="user.name"><a href="/" ng-click="cloudDownload()"><i class="fa fa-cloud-download"> Get latest</i></a></li>
+            <li ng-if="user.name"><a href="/" ng-click="cloudUpload()"><i class="fa fa-cloud-upload"> Send latest</i></a></li>
             <li ng-if="user.name"><a href="/logout"><i class="fa fa-sign-out"></i> Signout</a></li>
             <li><a href="/#/index"><i class="fa fa-home"></i> Back</a></li>
         </ul>
