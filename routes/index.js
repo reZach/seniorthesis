@@ -92,8 +92,7 @@ module.exports = function(passport){
             console.log(colors);
             console.log(activities);
             */
-                       
-            
+                        
             User.findOne({
                 'googleId': user.googleId
             }, function(err, user) {
