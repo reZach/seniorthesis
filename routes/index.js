@@ -14,7 +14,7 @@ module.exports = function(passport){
 
     // Home
     router.get("/", function(req, res){    
-        res.render("index", {title: "Express"});
+        res.render("home", {title: "Express"});
     });    
     
     // Google authenticate

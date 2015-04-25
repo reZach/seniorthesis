@@ -23,6 +23,28 @@ a {
 
 /* NEW */
 .white{color:white;}
-
-.js-sidebutton{background-color:#655555;height:30.5vh;}
-.js-sidebutton:hover {background-color:#333;}
+.black{color:black;}
+.header-height{height:7vh !important;}
+.js-sidebutton{
+    background-color:#655555;
+    height:30.75vh;
+    text-align:center;    
+    border-bottom:1px solid #333;
+    border-left:1px solid #333;
+    
+    -webkit-transition: background-color 0.5s, border-left 1s;
+    transition: background-color 0.5s, border-left 1s;
+}
+.js-sidebutton:hover {
+    background-color:#333;
+    border-left: 15px solid red;
+}
+.js-activity-box{
+    border-radius:15px;
+    -moz-border-radius:15px;
+    background-color:#fff;
+    margin-left:50px;
+    margin-right:50px;
+    padding-top:10px;
+    height:76vh;
+}

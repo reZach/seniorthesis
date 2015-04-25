@@ -10,12 +10,42 @@ var app = angular.module("myapp", ["googlechart", "ui.router"]);
 app.config([
     "$stateProvider", "$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
         $stateProvider
-            .state("index",
+            .state("home",
                 {
-                    url: "/index",
+                    url: "/home",
                     views: {
                         "hub": {
-                            templateUrl: "/views/partials/main.html" ,
+                            templateUrl: "/views/partials/activitiesSubmenu.html",
+                            controller: "activityCtrl"
+                        },
+                        "accountHub": {
+                            templateUrl: "/views/partials/userHub.html",
+                            controller: "userCtrl"
+                        }
+                    }
+                }
+            )
+            .state("graph",
+                {
+                    url: "/home/graph",
+                    views: {
+                        "hub": {
+                            templateUrl: "/views/partials/graphSubmenu.html",
+                            controller: "activityCtrl"                            
+                        },
+                        "accountHub": {
+                            templateUrl: "/views/partials/userHub.html",
+                            controller: "userCtrl"
+                        }
+                    }
+                }
+            )
+            .state("details",
+                {
+                    url: "/home/details",
+                    views: {
+                        "hub": {
+                            templateUrl: "/views/partials/detailsSubmenu.html",
                             controller: "activityCtrl"
                         },
                         "accountHub": {
@@ -42,7 +72,7 @@ app.config([
         );
         
             
-        $urlRouterProvider.otherwise("index");
+        $urlRouterProvider.otherwise("home");
     }
 ]);
 
@@ -318,6 +348,9 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
             },
             idleActivity: {
                 val: "Idle"
+            },
+            selectedActivity: {
+                val: ""
             }
         },
         
@@ -343,10 +376,14 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                 // Start the selected activity
                 if (activities[i].active){
                     obj.selectActivity(activities[i].name);
-                    activities = obj.getActivities();
+                    activities = obj.getActivities();                    
                     
                     obj.startSelectedActivity(activities[i].name);
                     activities = obj.getActivities();
+                }
+                
+                if (activities[i].selected){
+                    angular.copy({val: activities[i].name}, obj.data.selectedActivity);
                 }
                 
                 // No activity is idle on page load
@@ -473,6 +510,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
             
             // Needed to update controllers properly
             angular.copy(activities, obj.data.activities);
+            angular.copy({val: activityName}, obj.data.selectedActivity);
         },
         
         // Starts the currently selected activity
@@ -743,6 +781,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
                         
                         angular.copy({val: activities[i].name}, obj.data.idleActivity);
                         angular.copy({val: "Idle"}, obj.data.activeActivity);
+                        angular.copy({val: ""}, obj.data.selectedActivity);
                         break;
                     }
                 }
@@ -805,6 +844,7 @@ app.factory("activityService", ["pieSliceColorService", function(pieSliceColorSe
             angular.copy(activities, obj.data.activities);
             angular.copy({val: "Idle"}, obj.data.idleActivity);
             angular.copy({val: ""}, obj.data.activeActivity);
+            angular.copy({val: ""}, obj.data.selectedActivity);
         },
         
         // Stops activity (goes back to fresh load state)
@@ -1199,6 +1239,7 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
     $scope.googlechartdetails = graphService.data.details;
     $scope.activeActivity = activityService.data.activeActivity;
     $scope.idleActivity = activityService.data.idleActivity;
+    $scope.selectedActivity = activityService.data.selectedActivity;
     $scope.graphDay = "0";
     
     graphService.createChart($scope.graphDay);
@@ -1208,7 +1249,8 @@ app.controller("activityCtrl", ["$scope", "$interval", "activityService", "graph
     
         try
         {
-            activityService.addActivity(activityName);            
+            activityService.addActivity(activityName);
+            $scope.newActivityName = "";
         } catch (e) {
             alert(e);
         }
