@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var User = require('./../models/user');
-var Data = require('./../models/data');
+var Time = require('./../models/time');
 var Activity = require('./../models/activity');
+
 
 function ensureAuthenticated(req, res) {
   if (req.isAuthenticated()) { return true; }
@@ -45,32 +46,22 @@ module.exports = function(passport){
         return res.status(401).json({});
     });
     
-    router.get('/activitydata', function(req, res){
-    
-        console.log("In method");
+    router.get('/activitydata', function(req, res){    
         
-        if (req.isAuthenticated()){
-        
-            console.log("is authenticated");
+        if (req.isAuthenticated()){        
             
-            var user = req.user;
-            
-            console.log(user);
-                                   
-            User.findOne({
+            var user = req.user;                                 
+            var u = User.findOne({
                 "googleId": user.googleId
-            }).deepPopulate(['data'], function (err, user){
-                if (err) {
-                    console.log("error: ");
-                    console.log(err);
-                    
-                    return done(err);
-                }
-                
-                console.log("sending back user");
-                //return res.end(JSON.stringify(user));
-                return res.end(user);
             });
+            
+            u.deepPopulate(['activities', 'activities.time']).exec(function (err, user){
+                if (err){
+                    console.log("error");
+                }            
+                
+                return res.json(user);
+            });                      
         } else {
         
             console.log("is not authenticated");
@@ -101,43 +92,47 @@ module.exports = function(passport){
                 }
                 
                 // User was found                
-                if (user) {
-                    
-                    user.markModified('data');
+                if (user) {                   
                     
                     for (var i = 0; i < activities.length; i++){ // Loop through activities
                     
+                        // Create an activity
                         var singleActivity = new Activity({
                             name: activities[i].name,
                             active: activities[i].active,
                             selected: activities[i].selected,
                             idle: activities[i].idle,
-                            data: []
-                        });                                                
-                        
-                        singleActivity.markModified('data');
+                            activities: []
+                        });                       
                         
                         for (var j = 0; j < activities[i].data.length; j++){ // Loop through data
                    
-                            var data = new Data({
+                            // Create data for the activity
+                            var time = new Time({
                                 date: activities[i].data[j].date,
                                 time: activities[i].data[j].time,
                                 timestamp: activities[i].data[j].timestamp
                             });
                             
-                            singleActivity.data.push(data);
+                            // Need to save the data
+                            time.save();
+                            
+                            singleActivity.time.push(time);                            
                         }
                         
-                        user.data.push(singleActivity);
+                        // Need to save the activity
+                        singleActivity.save();
+                        user.activities.push(singleActivity);
                     }
                     
+                    // Need to save the user
                     user.save(function(err){
                         if (err) {
                             console.log(err);
                         }
                         
                         console.log('User information updated');
-                        res.send("success");
+                        res.send("User information updated");
                     });
                 } else {
                     console.log('User was not found');

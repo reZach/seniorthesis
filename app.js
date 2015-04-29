@@ -11,7 +11,7 @@ var bodyParser = require('body-parser');
 var databaseConfig = require('./db');
 var mongoose = require('mongoose');
 
-require('./models/data');
+require('./models/time');
 require('./models/activity');
 require('./models/user');
 

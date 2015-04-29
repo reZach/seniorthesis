@@ -6,4 +6,4 @@ var dataSchema = new mongoose.Schema({
     timestamp: {type: Number, default: 0}
 });
 
-module.exports = mongoose.model('Data', dataSchema);
+module.exports = mongoose.model('Time', dataSchema);

@@ -5,7 +5,7 @@ var activitySchema = new mongoose.Schema({
     active: Boolean,
     selected: Boolean,
     idle: Boolean,
-    data: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Data' }]
+    time: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Time' }]
 });
 
 module.exports = mongoose.model("Activity", activitySchema);

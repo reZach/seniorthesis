@@ -1,6 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var Data = require('./../models/data');
+var Data = require('./../models/time');
 var Activity = require('./../models/activity');
 var User = require('./../models/user');
 
