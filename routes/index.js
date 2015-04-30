@@ -61,7 +61,7 @@ module.exports = function(passport){
                 }            
                 
                 return res.json(user);
-            });                      
+            });
         } else {
         
             console.log("is not authenticated");

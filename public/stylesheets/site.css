@@ -40,9 +40,15 @@ a {
     border-left: 15px solid red;
 }
 .js-activity-box{
-    border-radius:15px;
+    /* Prevent background color leak outs */
+    -webkit-background-clip:padding-box; 
+    -moz-background-clip:padding; 
+    background-clip:padding-box;
+    -webkit-border-radius:15px;
     -moz-border-radius:15px;
-    background-color:#fff;
+    border-radius:15px;
+    background-color:#75BA80;
+    border:5px solid #000000;
     margin-left:50px;
     margin-right:50px;
     padding-top:10px;

@@ -17,7 +17,18 @@
         <script type="text/javascript" src="/javascripts/dependencies/cookie.js"></script>
         <script type="text/javascript" src="/javascripts/dependencies/ng-google-chart.js"></script>
         <script type="text/javascript" src="/javascripts/dependencies/startup.js"></script>
+        
+        <!-- Angular specifics -->
         <script type="text/javascript" src="/javascripts/app.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/routes/config.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/startup/startup.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/services/pieSliceColor.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/services/activity.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/services/graph.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/services/user.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/controllers/activity.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/controllers/user.js"></script>
+        <script type="text/javascript" src="/javascripts/angularjs/controllers/options.js"></script>
         
         <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
     </head>
@@ -26,8 +37,7 @@
             <div class="container">                
                 <div ui-view="accountHub" class="header-height"></div>
             </div>
-        </div>
-        <!--<div class="container body-content">-->            
+        </div>     
         <div>
             <div ui-view="hub"></div>                        
         </div>
