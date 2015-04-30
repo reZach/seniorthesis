@@ -87,28 +87,28 @@ angular.module("myapp").factory("graphService", ["activityService", "pieSliceCol
             
             chart.type = "PieChart";
             chart.options = {            
-                height: 360,
-                width: 360,
-                backgroundColor: "#C1DBF5",
+                height: 300,
+                width: 300,
+                backgroundColor: "#ffffff",
                 title: graphTitle,
                 legend: {
                     position: "none"
                 },
                 pieSliceTextStyle: {
                     color: "black", 
-                    fontName: "Ubuntu, sans-serif", 
-                    fontSize: 12
+                    fontName: "Muli, sans-serif", 
+                    fontSize: 14
                 },
                 titleTextStyle: {
                     color: "black", 
-                    fontName: "Ubuntu, sans-serif", 
-                    fontSize: 12
+                    fontName: "Muli, sans-serif", 
+                    fontSize: 14
                 },
                 tooltip: {
                     textStyle: {
                         color: "black", 
-                        fontName: "Ubuntu, sans-serif", 
-                        fontSize: 12
+                        fontName: "Muli, sans-serif", 
+                        fontSize: 14
                     }                                    
                 }                    
             };

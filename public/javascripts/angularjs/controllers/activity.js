@@ -13,6 +13,7 @@ angular.module("myapp").controller("activityCtrl", ["$scope", "$interval", "acti
     $scope.graphDay = "0";
     
     graphService.createChart($scope.graphDay);
+        
     
     // Creates a new activity
     $scope.newActivity = function(activityName){

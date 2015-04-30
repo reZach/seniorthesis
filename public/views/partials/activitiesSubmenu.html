@@ -139,11 +139,16 @@
                                 </div>
                             </div>                            
                         </div>
-                        <div style="float:right;width:49%;height:35vh;overflow-y:scroll;overflow-x:hidden;border-left:3px solid #666E67;">
-                            <div ng-repeat="activity in activities | orderBy: 'name'" style="margin:5px 10px;">
-                                <div class="btn btn-default text-left" title="Click to select this activity" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
-                                <div class="btn btn-danger" title="Delete activity and all corresponding data" ng-click="deleteActivity(activity.name)" style="float:right;"><i class="fa fa-times"></i></div>                        
+                        <div style="float:right;width:49%;height:35vh;overflow-y:scroll;overflow-x:hidden;border-left:3px solid #666E67;">                            
+                            <div ng-if="activities.length > 0">
+                                <div ng-repeat="activity in activities | orderBy: 'name'" style="margin:5px 10px;">
+                                    <div class="btn btn-default text-left" title="Click to select this activity" ng-class="{ active : activity.selected }" ng-click="selectActivity(activity.name)">{{ activity.name }}</div>
+                                    <div class="btn btn-danger" title="Delete activity and all corresponding data" ng-click="deleteActivity(activity.name)" style="float:right;"><i class="fa fa-times"></i></div>                        
+                                </div>
                             </div>
+                            <div ng-if="activities.length == 0" class="black" style="padding-top:50px;padding-left:30px;">                                
+                                There are no activities found! Add one to get started                            
+                            </div>                            
                         </div>                       
                     </div>
                     <div style="width:100%;">
@@ -164,7 +169,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
         </div>
