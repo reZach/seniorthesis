@@ -1,25 +1,76 @@
-<!-- Desktop | 992px + -->
-<div class="visible-lg">      
-    <div class="row">
-    
-        <div class="col-lg-12">
-            <h1 class="mainpage-header">Options</h1>
-            <div class="row text-left">
-                <div class="col-lg-4">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>Delete all data</td>
-                                <td><div class="btn btn-danger" ng-click="deleteAllData()">Delete</div></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>                
+
+<div class="visible-lg">
+    <div style="width:100%;">
+        <div style="float:left;width:85%;">
+            <div style="padding-top:50px;">
+                <div class="js-activity-box">
+                    <div style="text-align:center;border-bottom:3px solid #666E67;">
+                        <h2 class="black" style="display:block;">Options</h2>
+                        <span class="body black">Optional things</span>
+                    </div>
+                    <div style="width:100%;height:50vh;background-color:#ffffff;">
+                        <div style="float:left;">                            
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>Delete all data</td>
+                                        <td><div class="btn btn-danger" ng-click="deleteAllData()">Delete</div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>                        
+                    </div>
+                    <div class="body" style="width:100%;border-top:3px solid #666E67;">
+                        
+                    </div>
+                </div>
             </div>
         </div>
-        
+        <div style="float:right;width:15%;">
+            <div class="js-sidebutton">
+                <a href="/#/home">
+                    <div style="padding-top:20px;">
+                        <span class="fa-stack fa-4x">
+                            <i class="fa fa-square fa-stack-2x"></i>
+                            <i class="fa fa-list fa-inverse fa-stack-1x"></i>                        
+                        </span>
+                    </div>
+                    <div class="header white">
+                        <h3>Activities</h3>
+                    </div>
+                </a>                
+            </div>
+            <div class="js-sidebutton">                
+                <a href="/#/home/graph">
+                    <div style="padding-top:20px;">
+                        <span class="fa-stack fa-4x">
+                            <i class="fa fa-square fa-stack-2x"></i>
+                            <i class="fa fa-bar-chart fa-inverse fa-stack-1x"></i>
+                        </span>
+                    </div>
+                    <div class="header white">
+                        <h3>Graph</h3>
+                    </div>
+                </a>                                
+            </div>
+            <div class="js-sidebutton">
+                <a href="/#/home/details">
+                    <div style="padding-top:20px;">
+                        <span class="fa-stack fa-4x">
+                            <i class="fa fa-square fa-stack-2x"></i>
+                            <i class="fa fa-database fa-inverse fa-stack-1x"></i>
+                        </span>
+                    </div>
+                    <div class="header white">
+                        <h3>Details</h3>
+                    </div>
+                </a>                
+            </div>
+        </div>
     </div>
 </div>
+
+
 
 <!-- Tablet | 768-991px -->
 <div class="visible-sm visible-md">

@@ -7,7 +7,10 @@ angular.module("myapp").factory("graphService", ["activityService", "pieSliceCol
         // Holds all data
         data: {
             chart: {},
-            details: []
+            details: [],
+            date: {
+                val: ""
+            }
         },
 
         // Creates string representation of an activities' time
@@ -68,6 +71,8 @@ angular.module("myapp").factory("graphService", ["activityService", "pieSliceCol
             
             currentDay = new Date(currentDay);
             graphTitle += " (" + (currentDay.getMonth() + 1) + "/" + currentDay.getDate() + "/" + (currentDay.getFullYear() % 100) + ")";
+            
+            angular.copy({val: graphTitle}, obj.data.date);
             
             // Initialize all data for our chart
             // that we can ( minus activity data )            
@@ -192,9 +197,9 @@ angular.module("myapp").factory("graphService", ["activityService", "pieSliceCol
             
             // Set chart details
             obj.setChartDetails(graph);
-            
+                
             // Needed to update controllers properly
-            angular.copy(graph, obj.data.chart);
+            angular.copy(graph, obj.data.chart);            
         },
         
         // Sets details of the chart for other display

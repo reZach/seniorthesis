@@ -12,13 +12,23 @@
                             <div google-chart chart="googlechart" style="margin-left:380px;margin-top:8px;"/>
                         </div>                        
                     </div>
-                    <div class="body" style="width:100%;">
-                        <div style="float:left;width:50%;border-top:3px solid #666E67;">
+                    <div class="body" style="width:100%;border-top:3px solid #666E67;">
+                        <div style="float:left;width:25%;">
                             <div style="text-align:center;padding-top:5px;">
                                 <div class="btn btn-default" title="Previous day" ng-click="previousDay()"><i class="fa fa-angle-left"></i> Previous day</div>                
                             </div>                            
+                        </div>                        
+                        <div style="float:left;width:25%;">
+                            <div style="text-align:center;padding-top:5px;">
+                                <div class="btn btn-primary" title="Click to generate a chart" ng-click="generateChart()">Generate chart</div>                
+                            </div>
                         </div>
-                        <div style="float:right;width:50%;border-top:3px solid #666E67;">
+                        <div style="float:left;width:25%;">
+                            <div style="text-align:center;padding-top:5px;">
+                                <div disabled class="btn btn-default" title="Auto-generate chart (5 sec. intervals)" ng-click="autogenerateChart()"><i class="fa fa-refresh js-autogenerate-chart"></i></div>
+                            </div>
+                        </div>                        
+                        <div style="float:right;width:25%;">
                             <div style="text-align:center;padding-top:5px;">
                                 <div class="btn btn-default" title="Next day" ng-click="nextDay()">Next day <i class="fa fa-angle-right"></i></div>
                             </div>                            

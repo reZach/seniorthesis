@@ -10,7 +10,9 @@ angular.module("myapp").controller("activityCtrl", ["$scope", "$interval", "acti
     $scope.activeActivity = activityService.data.activeActivity;
     $scope.idleActivity = activityService.data.idleActivity;
     $scope.selectedActivity = activityService.data.selectedActivity;
-    $scope.graphDay = "0";
+    $scope.graphDate = graphService.data.date;
+    $scope.graphDay = 0;
+    
     
     graphService.createChart($scope.graphDay);
         
@@ -102,6 +104,9 @@ angular.module("myapp").controller("activityCtrl", ["$scope", "$interval", "acti
             $interval(function(){
 
                 graphService.createChart($scope.graphDay);
+        
+                $(".js-autogenerate-chart").addClass("fa-pulse active");
+                $(".js-autogenerate-chart").parent().attr("disabled", true);
             }, 5000);
         } catch (e) {
             $(".js-autogenerate-chart").removeClass("fa-pulse active");
