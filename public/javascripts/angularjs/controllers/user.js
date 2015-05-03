@@ -22,5 +22,11 @@ app.controller("userCtrl", ["$scope", "userService", function ($scope, userServi
             alert(e);
         }
     };
+    
+    userService.getMe().success(function(a){
+        // to-do?
+    }).error(function(b){
+        // to-do?
+    });
 
  }]);
