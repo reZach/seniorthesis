@@ -152,9 +152,14 @@ angular.module("myapp").factory("graphService", ["activityService", "pieSliceCol
             for (var i = 0; i < data.length; i++){
             
                 // Loop through each data block
-                for (var j = 0; j < data[i].data.length; j++){
+                for (var j = 0; j < data[i].time.length; j++){
                 
-                    dataBlockDate = new Date(data[i].data[j].date).setHours(0, 0, 0, 0);
+                    // Date will be a string if we grab data from the server
+                    if (typeof data[i].time[j].date === "string"){
+                        dataBlockDate = new Date(parseInt(data[i].time[j].date, 10)).setHours(0, 0, 0, 0);
+                    } else {
+                        dataBlockDate = new Date(data[i].time[j].date).setHours(0, 0, 0, 0);
+                    }                    
                     
                     // dayOfDataBlock will equal the string representation
                     // of the proper day
@@ -163,8 +168,8 @@ angular.module("myapp").factory("graphService", ["activityService", "pieSliceCol
                     if (dayOfDataBlock == day){
                         
                         // Calculate time
-                        totalActivityTime += data[i].data[j].time;
-                        individualActivityTime += data[i].data[j].time;
+                        totalActivityTime += data[i].time[j].time;
+                        individualActivityTime += data[i].time[j].time;
                     }
                 }
                 

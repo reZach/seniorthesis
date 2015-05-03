@@ -14,6 +14,8 @@ var mongoose = require('mongoose');
 require('./models/time');
 require('./models/activity');
 require('./models/user');
+require('./models/colors');
+require('./models/colorsdata');
 
 mongoose.connect(databaseConfig.url, databaseConfig.onStartConnect()); // Connect to database
 

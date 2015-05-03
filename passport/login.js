@@ -25,9 +25,10 @@ module.exports = function(passport){
                 user = new User({
                     googleId: profile.id,
                     name: profile.displayName,
-                    data: []
+                    data: [],
+                    colors: null
                 });
-                
+                                
                 user.save(function(err){
                     if (err) {
                         console.log(err);

@@ -114,7 +114,7 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                         active: false,
                         selected: false,
                         idle: false,
-                        data: []
+                        time: []
                     })], 
                     Infinity);
                     
@@ -138,7 +138,7 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                     active: false,
                     selected: false,
                     idle: false,
-                    data: []
+                    time: []
                 });
                 
                 pieSliceColorService.assignColor(activityName);
@@ -216,10 +216,10 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
             var currentTime = Date.now();
             var currentDate = new Date().setHours(0, 0, 0, 0);            
             
-            if (selectedActivity.data.length == 0){ // This activity hasn't been started before
+            if (selectedActivity.time.length == 0){ // This activity hasn't been started before
             
                 // Add first record to this activity
-                selectedActivity.data.push({
+                selectedActivity.time.push({
                     time: 0,
                     date: currentDate,
                     timestamp: currentTime
@@ -235,7 +235,7 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                 currentDate = new Date(currentTime).setHours(0, 0, 0, 0);
                 
                 // Look at the most recent data block                                
-                dataBlock = selectedActivity.data[selectedActivity.data.length - 1];                    
+                dataBlock = selectedActivity.time[selectedActivity.time.length - 1];                    
                 activityDataDate = new Date(dataBlock.date).setHours(0, 0, 0, 0);
                 
                 // If the current date is greater than the
@@ -244,7 +244,7 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                 if (currentDate > activityDataDate){
                 
                     // Create new data block
-                    selectedActivity.data.push({
+                    selectedActivity.time.push({
                         time: 0,
                         date: currentDate,
                         timestamp: currentTime
@@ -255,12 +255,12 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                 else if (currentDate == activityDataDate){
                     
                     // Update the latest data block
-                    if (selectedActivity.data[selectedActivity.data.length - 1].timestamp != 0){
+                    if (selectedActivity.time[selectedActivity.time.length - 1].timestamp != 0){
                     
-                        selectedActivity.data[selectedActivity.data.length - 1].time += (currentTime - selectedActivity.data[selectedActivity.data.length - 1].timestamp);
+                        selectedActivity.time[selectedActivity.time.length - 1].time += (currentTime - selectedActivity.time[selectedActivity.time.length - 1].timestamp);
                     }
                     
-                    selectedActivity.data[selectedActivity.data.length - 1].timestamp = currentTime;
+                    selectedActivity.time[selectedActivity.time.length - 1].timestamp = currentTime;
                 }
             }
             
@@ -283,26 +283,31 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
             // Loop through all activities
             for (var i = 0; i < activities.length; i++){
             
-                for (var j = 0; j < activities[i].data.length; j++){
+                for (var j = 0; j < activities[i].time.length; j++){
                 
                     // Get date of the data block of the activity
-                    activityDataDate = new Date(activities[i].data[j].date).setHours(0, 0, 0, 0);
+                    if (typeof activities[i].time[j].date === "string"){
+                        activityDataDate = new Date(parseInt(activities[i].time[j].date, 10)).setHours(0, 0, 0, 0);
+                    } else {
+                        activityDataDate = new Date(activities[i].time[j].date).setHours(0, 0, 0, 0);
+                    }
+                    
                     
                     // If the date of the data block and the current day are the same,
                     // we don't have to make a new data block
                     if (currentDate == activityDataDate){
                     
                         // Don't calculate anything if there is no need to
-                        if (activities[i].data[j].timestamp != 0){
+                        if (activities[i].time[j].timestamp != 0){
                         
-                            activities[i].data[j].time += (currentTime - activities[i].data[j].timestamp);
+                            activities[i].time[j].time += (currentTime - activities[i].time[j].timestamp);
                         }
                         
                         // Our timestamp is re-assigned to the current time
                         // if the activity is active, otherwise it is set to zero
-                        activities[i].data[j].timestamp = (activities[i].active ? currentTime : 0);
+                        activities[i].time[j].timestamp = (activities[i].active ? currentTime : 0);
                         
-                    } else if (currentDate > activityDataDate && activities[i].data.length - 1 == j){
+                    } else if (currentDate > activityDataDate && activities[i].time.length - 1 == j){
                  
                         // 86400000 milliseconds in a day                                        
 
@@ -313,7 +318,7 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                         if (numberOfDays > 1){
                             for (var k = 0; k < numberOfDays; k++){
                             
-                                activities[i].data.push({
+                                activities[i].time.push({
                                     date: activityDataDate + ((k + 1)*86400000), // Gets proper milliseconds for the day to represent the date
                                     time: (activities[i].active ? 86400000 : 0), // If activity was active, set to max time. Otherwise set to 0
                                     timestamp: 0 
@@ -322,27 +327,27 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
                         } else if (numberOfDays == 1){
                         
                             // Calculate time (less than a day's worth)
-                            if (activities[i].data[j].timestamp != 0){
+                            if (activities[i].time[j].timestamp != 0){
                             
                                 // Get time of the end of the last day
-                                var date = new Date(activities[i].data[j].timestamp).setHours(23, 59, 59, 999);
+                                var date = new Date(activities[i].time[j].timestamp).setHours(23, 59, 59, 999);
                                 
                                 // Calculate the time
-                                activities[i].data[j].time += date - activities[i].data[j].timestamp;
-                                activities[i].data[j].timestamp = 0;
+                                activities[i].time[j].time += date - activities[i].time[j].timestamp;
+                                activities[i].time[j].timestamp = 0;
                             }                            
                         }
                  
                         if (activities[i].active){
 
-                            activities[i].data.push({
+                            activities[i].time.push({
                                 date: currentDate,
                                 time: currentDate - new Date(currentDate).setHours(0, 0, 0, 0),
                                 timestamp: currentTime
                             });
                         } else {
                         
-                            activities[i].data.push({
+                            activities[i].time.push({
                                 date: currentDate,
                                 time: 0,
                                 timestamp: 0
@@ -541,12 +546,12 @@ angular.module("myapp").factory("activityService", ["pieSliceColorService", func
         updateLastDataBlock: function(activities, index, newTimestamp){
                     
             // Recalculates time and sets the timestamp
-            var lastDataBlock = activities[index].data.length - 1;
+            var lastDataBlock = activities[index].time.length - 1;
             var currentTime = Date.now();
              
             // math
-            activities[index].data[lastDataBlock].time += (currentTime - activities[index].data[lastDataBlock].timestamp);                            
-            activities[index].data[lastDataBlock].timestamp = (newTimestamp ? currentTime : 0);
+            activities[index].time[lastDataBlock].time += (currentTime - activities[index].time[lastDataBlock].timestamp);                            
+            activities[index].time[lastDataBlock].timestamp = (newTimestamp ? currentTime : 0);
             
             return activities;
         }

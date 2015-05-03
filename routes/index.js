@@ -3,6 +3,8 @@ var router = express.Router();
 var User = require('./../models/user');
 var Time = require('./../models/time');
 var Activity = require('./../models/activity');
+var Colors = require('./../models/colors');
+var ColorsData = require('./../models/colorsdata');
 
 
 function ensureAuthenticated(req, res) {
@@ -27,14 +29,14 @@ module.exports = function(passport){
     router.get('/auth/google_oauth2/callback',
         passport.authenticate('google'),
         function(req, res) {  
-            res.redirect('/');
+            res.redirect('/#/home');
         }
     );
     
     // Logout
     router.get('/logout', function(req, res){    
         req.logout();
-        res.redirect('/');
+        res.redirect('/#/home');
     });
     
     // Me
@@ -55,7 +57,7 @@ module.exports = function(passport){
                 "googleId": user.googleId
             });
             
-            u.deepPopulate(['activities', 'activities.time']).exec(function (err, user){
+            u.deepPopulate(['activities', 'activities.time', 'colors', 'colors.colors']).exec(function (err, user){
                 if (err){
                     console.log("error");
                 }            
@@ -80,19 +82,29 @@ module.exports = function(passport){
             
             // TESTS
             /*
-            console.log(colors);
-            console.log(activities);
+                console.log(colors);
+                console.log(activities);
             */
-                        
+            
+            // Find user in the database
             User.findOne({
                 'googleId': user.googleId
             }, function(err, user) {
+                
+                // If an error occurred, return the error
                 if (err) {
                     return done(err);
                 }
                 
                 // User was found                
-                if (user) {                   
+                if (user) { 
+
+                    // Reset any previous values
+                    user.activities = [];
+
+                    /*
+                        UPDATE ACTIVITIES
+                    */                
                     
                     for (var i = 0; i < activities.length; i++){ // Loop through activities
                     
@@ -105,13 +117,13 @@ module.exports = function(passport){
                             activities: []
                         });                       
                         
-                        for (var j = 0; j < activities[i].data.length; j++){ // Loop through data
+                        for (var j = 0; j < activities[i].time.length; j++){ // Loop through data
                    
                             // Create data for the activity
                             var time = new Time({
-                                date: activities[i].data[j].date,
-                                time: activities[i].data[j].time,
-                                timestamp: activities[i].data[j].timestamp
+                                date: activities[i].time[j].date,
+                                time: activities[i].time[j].time,
+                                timestamp: activities[i].time[j].timestamp
                             });
                             
                             // Need to save the data
@@ -124,6 +136,33 @@ module.exports = function(passport){
                         singleActivity.save();
                         user.activities.push(singleActivity);
                     }
+                    
+                    /*
+                        UPDATE COLORS
+                    */                                       
+                    
+                    var colorsArray = [];
+                    
+                    for (var i = 0; i < colors.length; i++){
+                    
+                        var singleColor = new ColorsData({
+                            color: colors[i].color, 
+                            activity: colors[i].activity
+                        });
+                        
+                        singleColor.save();
+                        
+                        colorsArray.push(singleColor);
+                    }
+                    
+                    var newColors = new Colors({
+                        googleId: user.googleId,
+                        colors: colorsArray
+                    });
+                    
+                    newColors.save();
+                    
+                    user.colors = newColors;
                     
                     // Need to save the user
                     user.save(function(err){
