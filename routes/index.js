@@ -39,24 +39,18 @@ module.exports = function(passport){
         res.redirect('/#/home');
     });
     
-    // Me
-    router.get('/getme', function(req, res){
-        if (req.isAuthenticated()){
-            return res.json(req.user);
-        }
-        
-        return res.status(401).json({});
-    });
-    
+    // Get data from the database
     router.get('/activitydata', function(req, res){    
         
         if (req.isAuthenticated()){        
             
+            // Find our user
             var user = req.user;                                 
             var u = User.findOne({
                 "googleId": user.googleId
             });
             
+            // Populate inner data models
             u.deepPopulate(['activities', 'activities.time', 'colors', 'colors.colors']).exec(function (err, user){
                 if (err){
                     console.log("error");
@@ -72,19 +66,15 @@ module.exports = function(passport){
         }
     });
 
+    // POST new information to the database
     router.post('/update', function(req, res) {
         
         if (req.isAuthenticated()){
         
+            // Grab our information (some of it comes from cookies)
             var user = req.user;
             var colors = JSON.parse(req.cookies.activityColors);
-            var activities = JSON.parse(req.cookies.activities);
-            
-            // TESTS
-            /*
-                console.log(colors);
-                console.log(activities);
-            */
+            var activities = JSON.parse(req.cookies.activities);            
             
             // Find user in the database
             User.findOne({

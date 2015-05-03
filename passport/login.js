@@ -1,4 +1,3 @@
-
 var Secrets = require('../secretkeys');
 var User = require('../models/user');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -28,7 +27,8 @@ module.exports = function(passport){
                     data: [],
                     colors: null
                 });
-                                
+                      
+                // Save new user
                 user.save(function(err){
                     if (err) {
                         console.log(err);

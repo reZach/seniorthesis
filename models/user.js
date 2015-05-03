@@ -8,6 +8,6 @@ var userSchema = new mongoose.Schema({
     colors: {type: mongoose.Schema.Types.ObjectId, ref: 'Colors' }
 });
 
-userSchema.plugin(deepPopulate);
+userSchema.plugin(deepPopulate); // Needed because we have models within this model
 
 module.exports = mongoose.model('User', userSchema);
