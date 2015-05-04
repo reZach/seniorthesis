@@ -6,6 +6,8 @@
 *************************************/
 angular.module("myapp").config([
     "$stateProvider", "$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
+        
+        // Configure urls for our application
         $stateProvider
             .state("home",
                 {

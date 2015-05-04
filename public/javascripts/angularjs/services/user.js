@@ -5,6 +5,8 @@ angular.module("myapp").factory("userService", ["$http", "activityService", func
     var o = {
         
         user: {},
+        
+        // Successful if we are able to find our user
         getMe: function() {
             var promise = $http.get('/getme');
             
@@ -15,12 +17,16 @@ angular.module("myapp").factory("userService", ["$http", "activityService", func
             
             return promise;
         },
+        
+        // Uploads data to the database
         upload: function() {
                      
             var promise = $http.post('/update');
             
             return promise;
         },
+        
+        // Retrieves data from the database
         download: function() {
         
             var promise = $http.get("/activitydata");

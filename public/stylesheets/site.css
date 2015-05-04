@@ -1,27 +1,15 @@
-body {
-  /*padding: 50px;*/
-  padding-top: 50px;
-  font-size: 14px;
-  font-family: 'Muli', sans-serif;
-  background-color: #b6a3a3;
-}
+body {padding-top: 50px;font-size: 14px;font-family: 'Muli', sans-serif;background-color: #b6a3a3;}
+h1, h2, h3, h4, h5, h6, p {font-family: 'Montserrat Alternates', sans-serif;}
+a {color: #00B7FF;}
 
+/* font styles */
 .header {font-family: 'Montserrat Alternates', sans-serif;}
 .body{font-family: 'Muli', sans-serif;}
 
-h1, h2, h3, h4, h5, h6, p {font-family: 'Montserrat Alternates', sans-serif;}
-
-a {
-  color: #00B7FF;
-}
-
+/* rest */
 .mainpage-header{margin:30px 0;}
 .navbar-gray {color:#999999;}
 .vertical-margin {margin: 10px 0;}
-
-
-
-/* NEW */
 .white{color:white;}
 .black{color:black;}
 .header-height{height:7vh !important;}

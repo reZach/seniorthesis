@@ -12,8 +12,7 @@ angular.module("myapp").controller("activityCtrl", ["$scope", "$interval", "acti
     $scope.selectedActivity = activityService.data.selectedActivity;
     $scope.graphDate = graphService.data.date;
     $scope.graphDay = 0;
-    
-    
+        
     graphService.createChart($scope.graphDay);
         
     

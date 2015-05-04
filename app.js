@@ -32,7 +32,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); // Use the public directory
 
 // Config Passport
 var passport = require('passport');
@@ -54,10 +54,7 @@ googleLogin(passport);
 
 // Config routes
 var routes = require('./routes/index')(passport);
-var routesApi = require('./routes/api');
-
 app.use('/', routes);
-app.use('/', routesApi);
 
 // Catch any routes we don't have paths for
 // 404 error

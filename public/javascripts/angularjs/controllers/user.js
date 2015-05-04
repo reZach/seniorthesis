@@ -3,6 +3,7 @@ app.controller("userCtrl", ["$scope", "userService", function ($scope, userServi
 
     $scope.user = userService.user;
     
+    // Downloads latest data from the database
     $scope.cloudDownload = function(){
     
         try
@@ -13,6 +14,7 @@ app.controller("userCtrl", ["$scope", "userService", function ($scope, userServi
         }        
     };
     
+    // Uploads latest dat to the database
     $scope.cloudUpload = function(){
     
         try
@@ -24,9 +26,9 @@ app.controller("userCtrl", ["$scope", "userService", function ($scope, userServi
     };
     
     userService.getMe().success(function(a){
-        // to-do?
+        // will load user options
     }).error(function(b){
-        // to-do?
+        // will not load user options
     });
 
  }]);

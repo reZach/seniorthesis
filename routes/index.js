@@ -39,7 +39,7 @@ module.exports = function(passport){
         res.redirect('/#/home');
     });
     
-    // Me
+    // Returns if we are authenticated or not
     router.get('/getme', function(req, res){
         if (req.isAuthenticated()){
             return res.json(req.user);
@@ -48,6 +48,7 @@ module.exports = function(passport){
         return res.status(401).json({});
     });
     
+    // Returns data from the database
     router.get('/activitydata', function(req, res){    
         
         if (req.isAuthenticated()){        
@@ -72,19 +73,16 @@ module.exports = function(passport){
         }
     });
 
+    // Updates data into our database
     router.post('/update', function(req, res) {
         
         if (req.isAuthenticated()){
         
+            // Get data
+            // Some data is grabbed from cookies
             var user = req.user;
             var colors = JSON.parse(req.cookies.activityColors);
-            var activities = JSON.parse(req.cookies.activities);
-            
-            // TESTS
-            /*
-                console.log(colors);
-                console.log(activities);
-            */
+            var activities = JSON.parse(req.cookies.activities);            
             
             // Find user in the database
             User.findOne({
